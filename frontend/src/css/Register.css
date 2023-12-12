@@ -1,0 +1,87 @@
+/* Register.css */
+
+.register-navbar {
+    background-color: #333;
+    display: flex;
+    justify-content: space-between;
+    padding: 10px;
+}
+
+.register-navbar a {
+    color: white;
+    text-decoration: none;
+    margin: 0 10px;
+}
+
+.register-body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 20px;
+}
+
+.register-title {
+    display: flex;
+    justify-content: center;
+    font-size: 24px;
+    margin: 10px 0;
+}
+
+.register-input-container {
+    margin: 10px 0;
+}
+
+.register-input-container input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    outline: none;
+}
+
+/* Center the button */
+.register-button-container {
+    display: flex;
+    justify-content: center; /* Center horizontally */
+    align-items: center; /* Center vertically */
+    flex-direction: column; /* Stack elements vertically */
+    margin: 20px 0; /* Adjust margin as needed */
+}
+
+.register-button {
+    background-color: #0074d9;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 10px; /* Add margin to separate from the text fields */
+}
+
+.register-login {
+    font-size: 14px;
+    margin-top: 10px;
+}
+
+.register-login a {
+    text-decoration: none;
+    color: #0074d9;
+}
+
+.register-signup button {
+    text-decoration: none;
+    color: #0074d9;
+}
+.register-login-button {
+    background-color: transparent;
+    color: #0074d9;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+    text-decoration: underline;
+    margin-top: 10px;
+}
+
+.register-login-button:hover {
+    text-decoration: none; /* Remove underline on hover */
+}
