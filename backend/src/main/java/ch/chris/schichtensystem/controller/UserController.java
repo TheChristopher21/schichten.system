@@ -1,5 +1,7 @@
 package ch.chris.schichtensystem.controller;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,12 +23,12 @@ public class UserController {
     @Autowired
     private UserRepoitory userRepoitory;
 
-    @GetMapping("/userinfo/{username}")
-    public ResponseEntity<User> getUserInfo(@PathVariable String username) {
-        User userInfo = userRepoitory.findByUsername(username).orElse(null);
-
-        if (userInfo != null) {
-            return ResponseEntity.ok(userInfo);
+    @GetMapping("/userdetails")
+    public ResponseEntity<List<User>> getAllUserDetails() {
+        List<User> userDetails = (List<User>) userRepoitory.findAll();
+        
+        if (!userDetails.isEmpty()) {
+            return ResponseEntity.ok(userDetails);
         } else {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
         }
