@@ -7,6 +7,7 @@ import Register from "./Register";
 import Login from "./Login";
 import Header from "./components/Header"
 import Start from "./Start";
+import CalendarEditPage from "./CalendarEditPage";
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
@@ -22,6 +23,7 @@ root.render(
           <Route path="Login" element={<Login />} />
           <Route path="Register" element={<Register />} />
           <Route path="Start" element={<Start />} />
+          <Route path="CalendarEditPage" element={<CalendarEditPage />} />
 
           <Route path="*" element={<App />} />
       </Routes>
