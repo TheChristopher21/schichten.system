@@ -6,11 +6,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import ch.chris.schichtensystem.model.User;
 import ch.chris.schichtensystem.model.UserRepoitory;
@@ -34,6 +35,17 @@ public class UserController {
         }
     }
 
+    @RestControllerAdvice
+    public class GlobalExceptionHandler {
+
+        @ExceptionHandler(Exception.class)
+        public ResponseEntity<String> handleException(Exception ex) {
+            // Hier kannst du den Fehler erfassen und eine detaillierte Fehlermeldung zurückgeben
+            String errorMessage = "Ein Fehler ist aufgetreten: " + ex.getMessage();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorMessage);
+        }
+    }
+    
     
     @PostMapping("register")
     public ResponseEntity<String> createUser(@Valid @RequestBody User user) {
@@ -54,5 +66,6 @@ public class UserController {
         } else {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid credentials");
         }
+        
     }
 }

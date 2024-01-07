@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import './css/CalendatEditPage.css';
+import './css/CalendarEditPage.css';
 
 interface Shift {
     id: number;
@@ -43,6 +43,20 @@ const CalendarEditPage: React.FC = () => {
         });
     }, []);
 
+    // Funktion, um Schichten nach Benutzer und Wochentagen zu gruppieren
+    const groupShiftsByUserAndDay = () => {
+        const groupedShifts: Record<string, Record<string, Shift[]>> = {};
+        users.forEach(user => {
+            groupedShifts[user.id] = {};
+            ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'].forEach(day => {
+                groupedShifts[user.id][day] = shifts.filter(shift => shift.userId === user.id && shift.date === day);
+            });
+        });
+        return groupedShifts;
+    };
+
+
+    const groupedShifts = groupShiftsByUserAndDay();
     const handleAssignShift = async () => {
         if (!newShiftId || !newShiftText || !newShiftDate || !selectedUserId) {
             console.error('Please fill out all fields.');
@@ -78,7 +92,7 @@ const CalendarEditPage: React.FC = () => {
 
     const handleEdit = (shiftId: number, field: string, newValue: string | number) => {
         const updatedShifts = shifts.map((shift) =>
-            shift.id === shiftId ? { ...shift, [field]: newValue.toString() } : shift
+            shift.id === shiftId ? {...shift, [field]: newValue.toString()} : shift
         );
         setShifts(updatedShifts);
     };
@@ -86,7 +100,7 @@ const CalendarEditPage: React.FC = () => {
         try {
             const shiftToUpdate = shifts.find((shift) => shift.id === shiftId);
             if (shiftToUpdate) {
-                const updatedShift = { ...shiftToUpdate, text: newText };
+                const updatedShift = {...shiftToUpdate, text: newText};
                 await axios.put(`http://localhost:8080/shift/${shiftId}`, updatedShift);
                 console.log('Shift updated successfully.');
                 const response = await axios.get<Shift[]>('http://localhost:8080/shift');
@@ -113,36 +127,50 @@ const CalendarEditPage: React.FC = () => {
     return (
         <div className="calendar-edit-page">
             <div className="calendar">
-                <div className="grid-container">
+                <div className="user-list">
                     <div className="header-row">
                         <span></span> {/* Leerer Bereich für den Header */}
+                        {/* Fügen Sie die Wochentage hinzu */}
                         {['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'].map((day, index) => (
                             <span key={`header-${index}`}>{day}</span>
                         ))}
                     </div>
+                    {/* Mappen der Benutzer */}
                     {users.map((user) => (
-                        <div key={`user-${user.id}`} className="user-row">
+                        <div key={`user-${user.id}`} className="user-item">
                             <h3>{`${user.firstname} ${user.lastname}`}</h3>
-                            {['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'].map((day, index) => (
-                                <div key={`day-${user.id}-${index}`} className="shift-item">
-                                    {shifts.filter((shift) => shift.date === day && shift.userId === user.id).map((shift, shiftIndex) => (
-                                        <div key={`shift-${shiftIndex}`}>
-                                            <span>ID: {shift.shiftid}</span>
-                                            <input
-                                                type="text"
-                                                value={shift.text}
-                                                onChange={(e) => {
-                                                    const newText = e.target.value;
-                                                    handleEdit(shift.id, 'text', newText);
-                                                }}
-                                            />
-
-                                            <button onClick={() => handleSave(shift.id, shift.text)}>Speichern</button>
-                                            <button onClick={() => handleDelete(shift.id)}>Löschen</button>
+                            <div className="user-shifts">
+                                {/* Mappen der Wochentage außerhalb der Schleife für die Benutzer */}
+                                {['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'].map((day, index) => {
+                                    const userShifts = groupedShifts[user.id][day];
+                                    return (
+                                        <div key={`shift-${user.id}-${index}`} className="shift-item">
+                                            {/* Überprüfen und Anzeigen der Schicht des Benutzers an diesem Wochentag */}
+                                            {userShifts.length > 0 ? (
+                                                userShifts.map((shift, shiftIndex) => (
+                                                    <div key={`shift-${shiftIndex}`}>
+                                                        <span>ID: {shift.shiftid}</span>
+                                                        <input
+                                                            type="text"
+                                                            value={shift.text}
+                                                            onChange={(e) => {
+                                                                const newText = e.target.value;
+                                                                handleEdit(shift.id, 'text', newText);
+                                                            }}
+                                                        />
+                                                        <button onClick={() => handleSave(shift.id, shift.text)}>Speichern</button>
+                                                        <button onClick={() => handleDelete(shift.id)}>Löschen</button>
+                                                    </div>
+                                                ))
+                                            ) : (
+                                                <div>
+                                                    {/* Wenn keine Schicht vorhanden ist, zeige leere Felder an */}
+                                                </div>
+                                            )}
                                         </div>
-                                    ))}
-                                </div>
-                            ))}
+                                    );
+                                })}
+                            </div>
                         </div>
                     ))}
                 </div>

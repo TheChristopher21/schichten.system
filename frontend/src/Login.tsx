@@ -13,7 +13,7 @@ function Login() {
 
     const handleLogin = async () => {
         try {
-            const response = await axios.post("http://localhost:5000/login", formData);
+            const response = await axios.post("http://localhost:8080/user/login", formData);
             console.log(response.data);
             navigate('/App'); // Navigiere zur App-Seite nach erfolgreicher Anmeldung
         } catch (error) {

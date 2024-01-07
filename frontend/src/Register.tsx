@@ -6,11 +6,11 @@ import axios from "axios";
 function Registrieren() {
     const navigate = useNavigate();
     const [formData, setFormData] = useState({
-        benutzername: "",
-        vorname: "",
-        nachname: "",
+        username: "",
+        firstname: "",
+        lastname: "",
         email: "",
-        passwort: ""
+        password: ""
     });
     const [statusMessage, setStatusMessage] = useState("");
 
@@ -53,7 +53,7 @@ function Registrieren() {
                     <div className="register-input-container">
                         <input
                             type="text"
-                            id="benutzername"
+                            id="username"
                             placeholder="Benutzername"
                             autoComplete="off"
                             onChange={handleInputChange}
@@ -63,7 +63,7 @@ function Registrieren() {
                     <div className="register-input-container">
                         <input
                             type="text"
-                            id="vorname"
+                            id="firstname"
                             placeholder="Vorname"
                             autoComplete="off"
                             onChange={handleInputChange}
@@ -73,7 +73,7 @@ function Registrieren() {
                     <div className="register-input-container">
                         <input
                             type="text"
-                            id="nachname"
+                            id="lastname"
                             placeholder="Nachname"
                             autoComplete="off"
                             onChange={handleInputChange}
@@ -93,7 +93,7 @@ function Registrieren() {
                     <div className="register-input-container">
                         <input
                             type="password"
-                            id="passwort" // Ändere die ID auf "passwort"
+                            id="password" // Ändere die ID auf "passwort"
                             placeholder="Passwort"
                             autoComplete="off"
                             onChange={handleInputChange}
