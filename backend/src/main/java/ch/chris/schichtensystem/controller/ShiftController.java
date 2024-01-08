@@ -1,6 +1,5 @@
 package ch.chris.schichtensystem.controller;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -12,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import ch.chris.schichtensystem.model.Shift;
 import ch.chris.schichtensystem.model.ShiftRepository;
 
+@CrossOrigin(origins = "http://localhost:3000")
 @RestController
 @RequestMapping("/shift")
 public class ShiftController {
@@ -25,11 +25,10 @@ public class ShiftController {
 
     @GetMapping
     public ResponseEntity<List<Shift>> getAllShifts() {
-        Iterable<Shift> shiftsIterable = shiftRepository.findAll();
-        List<Shift> shifts = new ArrayList<>();
-        shiftsIterable.forEach(shifts::add);
-        return new ResponseEntity<>(shifts, HttpStatus.OK);
+        List<Shift> shifts = (List<Shift>) shiftRepository.findAll();
+        return ResponseEntity.ok(shifts);
     }
+
     @GetMapping("/{id}")
     public ResponseEntity<Shift> getShiftById(@PathVariable int id) {
         Optional<Shift> optionalShift = shiftRepository.findById(id);
@@ -37,9 +36,14 @@ public class ShiftController {
     }
 
     @PostMapping
-    public ResponseEntity<Shift> createShift(@Validated @RequestBody Shift shift) {
-        Shift createdShift = shiftRepository.save(shift);
-        return new ResponseEntity<>(createdShift, HttpStatus.CREATED);
+    public ResponseEntity<?> createShift(@Validated @RequestBody Shift shift) {
+        try {
+            Shift createdShift = shiftRepository.save(shift);
+            return new ResponseEntity<>(createdShift, HttpStatus.CREATED);
+        } catch (Exception e) {
+            // Return a meaningful error message
+            return new ResponseEntity<>("Error creating shift: " + e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
     }
 
     @PutMapping("/{id}")
@@ -56,8 +60,6 @@ public class ShiftController {
             return ResponseEntity.notFound().build();
         }
     }
-
-
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteShift(@PathVariable int id) {

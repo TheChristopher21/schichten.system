@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import './css/Register.css';
+import styles from './css/Register.module.css';
 import { useNavigate } from 'react-router-dom';
 import axios from "axios";
 
@@ -40,15 +40,15 @@ function Registrieren() {
     };
 
     return (
-        <div>
-            <div className="register-navbar">
+        <div className={styles.registerContainer}>
+            <div className={styles.registerNavbar}>
                 <a href="App.tsx">Home</a>
                 <a href="">Neuigkeiten</a>
                 <a href="Login.tsx">Login</a>
             </div>
-            <div className="register-body">
+            <div className={styles.registerBody}>
                 <form onSubmit={handleSubmit}>
-                    <h1 className="register-title">Account Erstellen</h1>
+                    <h1 className={styles.registerTitle}>Account Erstellen</h1>
 
                     <div className="register-input-container">
                         <input
@@ -101,7 +101,7 @@ function Registrieren() {
                     </div>
 
                     <div className="register-button-container">
-                        <button  type="submit" className="register-button" name="submit">
+                        <button type="submit" className="register-button" name="submit">
                             Erstellen
                         </button>
                         <br></br>
@@ -113,7 +113,9 @@ function Registrieren() {
                         </div>
                     )}
 
-                    <button onClick={() => { navigate("/Login") }} className="register-login-button">
+                    <button onClick={() => {
+                        navigate("/Login")
+                    }} className="register-login-button">
                         Schon ein Account erstellt? Jetzt Einloggen!
                     </button>
                 </form>
@@ -121,4 +123,5 @@ function Registrieren() {
         </div>
     );
 }
+
 export default Registrieren;

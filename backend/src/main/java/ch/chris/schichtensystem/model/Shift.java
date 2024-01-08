@@ -24,6 +24,8 @@ public class Shift {
     @NotBlank(message = "text cannot be blank")
     private String text;
 
+    private int userId;
+
     public Shift() {
         // Default constructor
     }
@@ -60,8 +62,18 @@ public class Shift {
         this.text = text;
     }
 
-	public void setId(int id2) {
-		// TODO Auto-generated method stub
-		
-	}
+    public int getUserId() {
+        return userId;
+    }
+
+    public void setUserId(String userId) {
+        try {
+            this.userId = Integer.parseInt(userId);
+        } catch (NumberFormatException e) {
+            // Log the error for debugging
+            System.out.println("Invalid userId: " + userId);
+            // Set a default value or throw an exception
+            throw new IllegalArgumentException("Invalid userId: " + userId);
+        }
+    }
 }

@@ -1,5 +1,5 @@
 import React, { useState, ChangeEvent, FormEvent } from "react";
-import './css/Login.css';
+import styles from './css/Login.module.css';
 import { useNavigate } from 'react-router-dom';
 import axios from "axios";
 
@@ -36,46 +36,46 @@ function Login() {
     };
 
     return (
-        <div>
-            <div className="login-navbar">
+        <div className={styles.loginContainer}>
+            <div className={styles.loginNavbar}>
                 <a href="App.tsx">Home</a>
                 <a href="">Neuigkeiten</a>
                 <a href="Login.tsx">Login</a>
             </div>
-            <div className="login-body">
-                <form onSubmit={handleSubmit} className="formlogin">
-                    <h1 className="login-title">LogIn</h1>
-                    <div className="login-input-container">
+            <div className={styles.loginBody}>
+                <form onSubmit={handleSubmit} className={styles.formLogin}>
+                    <h1 className={styles.loginTitle}>LogIn</h1>
+                    <div className={styles.inputContainer}>
                         <input
-                            type="text" // Ändere den Typ von "email" auf "text"
-                            id="username" // Ändere die ID auf "username" für den Benutzernamen
-                            placeholder="Benutzername" // Ändere den Platzhaltertext
+                            type="text"
+                            id="username"
+                            placeholder="Benutzername"
                             autoComplete="off"
                             onChange={handleInputChange}
-                        /><br></br>
+                        /><br />
                     </div>
-                    <div className="login-input-container">
+                    <div className={styles.inputContainer}>
                         <input
                             type="password"
                             id="password"
                             placeholder="Passwort"
                             autoComplete="off"
                             onChange={handleInputChange}
-                        /><br></br>
+                        /><br />
                     </div>
-                    <div className="login-button-container">
-                        <button type="submit" className="login-button">
+                    <div className={styles.buttonContainer}>
+                        <button type="submit" className={styles.loginButton}>
                             LogIn
-                        </button><br></br>
+                        </button><br />
                     </div>
                 </form>
-                <div className="login-signup">
-                    <button onClick={() => { navigate("/Register") }}>
+                <div className={styles.signup}>
+                    <button onClick={() => navigate("/Register")}>
                         Noch kein Account? Jetzt Registrieren
-                    </button><br></br>
+                    </button><br />
                 </div>
                 {statusMessage && (
-                    <div className="status-message">
+                    <div className={styles.statusMessage}>
                         {statusMessage}
                     </div>
                 )}

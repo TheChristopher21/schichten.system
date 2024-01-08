@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import './css/App.css';
 import { useNavigate } from 'react-router-dom';
 import { Shift, ShiftType } from './components/Shift';
 

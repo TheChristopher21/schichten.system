@@ -1,14 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import './css/CalendarEditPage.css';
-
+import styles from './css/CalendarEditPage.module.css';
 interface Shift {
-    id: number;
+    id: number | null; // ID kann entweder eine Zahl oder null sein
     shiftid: string;
     date: string;
     text: string;
     userId?: string;
 }
+
+
 
 interface User {
     id: string;
@@ -23,6 +24,8 @@ const CalendarEditPage: React.FC = () => {
     const [newShiftId, setNewShiftId] = useState('');
     const [newShiftDate, setNewShiftDate] = useState('');
     const [selectedUserId, setSelectedUserId] = useState('');
+    const weekDays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']; // Wochentage aktualisiert
+
 
     useEffect(() => {
         const fetchData = async () => {
@@ -31,7 +34,8 @@ const CalendarEditPage: React.FC = () => {
                     axios.get<Shift[]>('http://localhost:8080/shift'),
                     axios.get<User[]>('http://localhost:8080/user/userdetails')
                 ]);
-                console.log(shiftsResponse);
+                console.log("Shifts data:", shiftsResponse.data);
+                console.log("Users data:", usersResponse.data);
                 setShifts(shiftsResponse.data);
                 setUsers(usersResponse.data);
             } catch (error) {
@@ -40,21 +44,21 @@ const CalendarEditPage: React.FC = () => {
         };
         fetchData().catch(() => {
             console.log("daten konnten nicht abgefragt werden")
+
         });
     }, []);
-
     // Funktion, um Schichten nach Benutzer und Wochentagen zu gruppieren
     const groupShiftsByUserAndDay = () => {
         const groupedShifts: Record<string, Record<string, Shift[]>> = {};
         users.forEach(user => {
             groupedShifts[user.id] = {};
-            ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'].forEach(day => {
-                groupedShifts[user.id][day] = shifts.filter(shift => shift.userId === user.id && shift.date === day);
+            weekDays.forEach(day => {
+                groupedShifts[user.id][day] = shifts.filter(shift =>
+                    shift.userId === user.id.toString() && shift.date === day);
             });
         });
         return groupedShifts;
     };
-
 
     const groupedShifts = groupShiftsByUserAndDay();
     const handleAssignShift = async () => {
@@ -69,12 +73,15 @@ const CalendarEditPage: React.FC = () => {
         const dayOfWeek = weekDays[selectedDay];
 
         const newShift: Shift = {
-            id: 0,
+            id: 0, // Hier setzen Sie die ID auf eine Zahl
             shiftid: newShiftId,
             date: dayOfWeek,
             text: newShiftText,
             userId: selectedUserId,
         };
+
+
+
 
         try {
             const response = await axios.post('http://localhost:8080/shift', newShift);
@@ -85,11 +92,15 @@ const CalendarEditPage: React.FC = () => {
             setNewShiftDate('');
             setSelectedUserId('');
             console.log('Shift assigned successfully.');
+
+            // Aktualisierung der Schichtendaten von der API
+            const shiftResponse = await axios.get<Shift[]>('http://localhost:8080/shift');
+            setShifts(shiftResponse.data);
         } catch (error) {
             console.error('Error assigning shift: ', error);
         }
-    };
 
+    };
     const handleEdit = (shiftId: number, field: string, newValue: string | number) => {
         const updatedShifts = shifts.map((shift) =>
             shift.id === shiftId ? {...shift, [field]: newValue.toString()} : shift
@@ -124,65 +135,51 @@ const CalendarEditPage: React.FC = () => {
     };
 
 
+
     return (
-        <div className="calendar-edit-page">
-            <div className="calendar">
-                <div className="user-list">
-                    <div className="header-row">
-                        <span></span> {/* Leerer Bereich für den Header */}
-                        {/* Fügen Sie die Wochentage hinzu */}
-                        {['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'].map((day, index) => (
-                            <span key={`header-${index}`}>{day}</span>
-                        ))}
+        <div className={styles.calendarEditPage}>
+            <div className={styles.userList}>
+                {users.map(user => (
+                    <div key={user.id} className={styles.userItem}>
+                        <h3>{`${user.firstname} ${user.lastname}`}</h3>
                     </div>
-                    {/* Mappen der Benutzer */}
-                    {users.map((user) => (
-                        <div key={`user-${user.id}`} className="user-item">
-                            <h3>{`${user.firstname} ${user.lastname}`}</h3>
-                            <div className="user-shifts">
-                                {/* Mappen der Wochentage außerhalb der Schleife für die Benutzer */}
-                                {['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'].map((day, index) => {
-                                    const userShifts = groupedShifts[user.id][day];
-                                    return (
-                                        <div key={`shift-${user.id}-${index}`} className="shift-item">
-                                            {/* Überprüfen und Anzeigen der Schicht des Benutzers an diesem Wochentag */}
-                                            {userShifts.length > 0 ? (
-                                                userShifts.map((shift, shiftIndex) => (
-                                                    <div key={`shift-${shiftIndex}`}>
-                                                        <span>ID: {shift.shiftid}</span>
-                                                        <input
-                                                            type="text"
-                                                            value={shift.text}
-                                                            onChange={(e) => {
-                                                                const newText = e.target.value;
-                                                                handleEdit(shift.id, 'text', newText);
-                                                            }}
-                                                        />
-                                                        <button onClick={() => handleSave(shift.id, shift.text)}>Speichern</button>
-                                                        <button onClick={() => handleDelete(shift.id)}>Löschen</button>
-                                                    </div>
-                                                ))
-                                            ) : (
-                                                <div>
-                                                    {/* Wenn keine Schicht vorhanden ist, zeige leere Felder an */}
-                                                </div>
-                                            )}
-                                        </div>
-                                    );
-                                })}
-                            </div>
-                        </div>
+                ))}
+            </div>
+
+            <div className={styles.calendarGrid}>
+                <div className={styles.headerRow}>
+                    {weekDays.map(day => (
+                        <div key={day} className={styles.headerCell}>{day}</div>
                     ))}
                 </div>
+                {users.map(user => (
+                    <div key={user.id} className={styles.userRow}>
+                        {weekDays.map(day => (
+                            <div key={day} className={styles.shiftCell}>
+                                {groupedShifts[user.id] && groupedShifts[user.id][day] && groupedShifts[user.id][day].map((shift, index) => (
+                                    <div key={index}>
+
+                                        {shift.text} (ID: {shift.shiftid})
+                                        {/* Weitere Interaktionen wie Bearbeiten und Löschen können hier hinzugefügt werden */}
+                                    </div>
+                                ))}
+                            </div>
+                        ))}
+                    </div>
+                ))}
             </div>
-            <div className="assign-shift">
+
+            <div className={styles.assignShift}>
                 <h2>Schicht zuweisen</h2>
-                <label>Mitarbeiter ID:</label>
-                <input
-                    type="text"
-                    value={selectedUserId}
-                    onChange={(e) => setSelectedUserId(e.target.value)}
-                />
+                <label>Mitarbeiter auswählen:</label>
+                <select value={selectedUserId} onChange={(e) => setSelectedUserId(e.target.value)}>
+                    <option value="">Bitte auswählen</option>
+                    {users.map(user => (
+                        <option key={user.id} value={user.id}>
+                            {`${user.firstname} ${user.lastname}`}
+                        </option>
+                    ))}
+                </select>
                 <input
                     type="text"
                     placeholder="Shift ID"
@@ -204,6 +201,9 @@ const CalendarEditPage: React.FC = () => {
             </div>
         </div>
     );
+
+
 };
 
 export default CalendarEditPage;
+
