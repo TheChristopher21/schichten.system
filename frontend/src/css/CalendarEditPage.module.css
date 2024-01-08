@@ -1,0 +1,63 @@
+.calendarEditPage {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%; /* Stellen Sie sicher, dass die Breite angemessen ist */
+    padding: 20px;
+}
+
+.userList {
+    width: 100%;
+    display: flex;
+    justify-content: center; /* Zentriert die User-Items, falls gewünscht */
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+}
+
+
+.userItem {
+    margin-right: 15px;
+    margin-bottom: 15px;
+}
+
+.calendarGrid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr); /* 7 Spalten für 7 Tage */
+    grid-gap: 10px;
+    width: 100%;
+}
+
+
+.headerRow {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr); /* 7 Tage */
+}
+
+.headerRow, .userRow {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr); /* 7 Spalten für 7 Tage */
+}
+
+.headerCell, .shiftCell {
+    padding: 5px;
+    border: 1px solid #ddd;
+    text-align: center;
+    min-height: 50px; /* oder eine passende Höhe */
+}
+
+
+.userRow {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr); /* 7 Tage */
+}
+
+.assignShift {
+    margin-top: 20px;
+}
+
+@media (max-width: 768px) {
+    .calendarGrid {
+        grid-template-columns: repeat(3, 1fr); /* Weniger Spalten auf kleineren Bildschirmen */
+    }
+    /* Weitere responsive Anpassungen... */
+}
