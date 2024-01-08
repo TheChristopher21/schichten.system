@@ -4,7 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="27653667-0316-436e-83f6-d03be46b95e0" name="Changes" comment="Merge remote-tracking branch 'origin/main'" />
+    <list default="true" id="27653667-0316-436e-83f6-d03be46b95e0" name="Changes" comment="Merge remote-tracking branch 'origin/main'">
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -42,14 +45,13 @@
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "WebServerToolWindowFactoryState": "false",
     "git-widget-placeholder": "main",
-    "ignore.virus.scanning.warn.message": "true",
-    "last_opened_file_path": "C:/Users/siefe/WebstormProjects/schichten.system/frontend",
+    "last_opened_file_path": "/home/chris/Desktop/schichten.system/frontend",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
     "node.js.selected.package.tslint": "(autodetect)",
     "nodejs_package_manager_path": "npm",
-    "ts.external.directory.path": "/home/chris/WebstormProjects/schichten-system/frontend/node_modules/typescript/lib",
+    "ts.external.directory.path": "/home/chris/Desktop/schichten.system/frontend/node_modules/typescript/lib",
     "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
@@ -78,7 +80,7 @@
       <workItem from="1701850942902" duration="348000" />
       <workItem from="1701851297315" duration="16000" />
       <workItem from="1701852593408" duration="23000" />
-      <workItem from="1703119978191" duration="23000" />
+      <workItem from="1704699472030" duration="18000" />
     </task>
     <task id="LOCAL-00001" summary="db">
       <option name="closed" value="true" />
