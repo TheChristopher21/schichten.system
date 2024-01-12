@@ -1,68 +1,80 @@
+/* Login.module.css */
+
 .loginContainer {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    min-height: 100vh;
     display: flex;
     flex-direction: column;
-    max-width: 400px;
-    margin: 50px auto;
-    padding: 20px;
-    background-color: #f8f9fa;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    border-radius: 8px;
+    align-items: center;
+    justify-content: center;
 }
 
 .loginNavbar {
-    display: flex;
-    justify-content: center;
-    gap: 20px;
-    margin-bottom: 20px;
+    background-color: #333;
+    color: #fff;
+    padding: 10px;
+    text-align: right;
+}
+
+.loginNavbar a {
+    color: #fff;
+    text-decoration: none;
+    margin-left: 10px;
 }
 
 .loginBody {
-    display: flex;
-    flex-direction: column;
+    background-color: #fff;
+    border-radius: 5px;
+    box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.2);
+    padding: 20px;
+    text-align: center;
+    width: 300px;
 }
 
 .formLogin {
     display: flex;
     flex-direction: column;
-    gap: 15px;
-}
-
-.loginTitle {
-    text-align: center;
-    color: #007bff;
-    margin-bottom: 20px;
-}
-
-.inputContainer input {
-    width: 100%;
-    padding: 12px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-}
-
-.buttonContainer {
-    display: flex;
-    flex-direction: column;
     align-items: center;
 }
 
-.loginButton {
-    width: 100%;
-    background-color: #007bff;
-    color: white;
-    padding: 10px;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: background-color 0.2s;
+.loginTitle {
+    font-size: 24px;
+    margin-bottom: 20px;
 }
 
-.loginButton:hover {
-    background-color: #0056b3;
+.inputContainer {
+    margin-bottom: 15px;
+}
+
+input[type="text"],
+input[type="password"] {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+.loginButton {
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    padding: 10px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.signup button {
+    background-color: #28a745;
+    color: #fff;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 10px;
 }
 
 .statusMessage {
-    color: #dc3545;
-    text-align: center;
-    margin-top: 15px;
+    color: red;
+    margin-top: 10px;
 }

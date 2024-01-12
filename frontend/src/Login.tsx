@@ -10,12 +10,14 @@ function Login() {
         password: ""
     });
     const [statusMessage, setStatusMessage] = useState("");
+    const [username, setUsername] = useState(''); // Zustand für Benutzername
+    const [password, setPassword] = useState(''); // Zustand für Passwort
 
     const handleLogin = async () => {
         try {
             const response = await axios.post("http://localhost:8080/user/login", formData);
             console.log(response.data);
-            navigate('/App'); // Navigiere zur App-Seite nach erfolgreicher Anmeldung
+            navigate('/CalendarViewPage'); // Navigiere zur App-Seite nach erfolgreicher Anmeldung
         } catch (error) {
             console.error(error);
             setStatusMessage("Fehler beim Einloggen!"); // Zeige eine Fehlermeldung an, wenn der Login fehlschlägt
@@ -23,15 +25,18 @@ function Login() {
     };
 
     const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
-        setFormData({ ...formData, [e.target.id]: e.target.value });
+        setFormData({ ...formData, [e.target.name]: e.target.value });
     };
 
-    const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
+    const handleSubmit = async (event: FormEvent) => {
+        event.preventDefault();
         try {
-            await handleLogin();
+            const response = await axios.post("http://localhost:8080/user/login", formData);
+            localStorage.setItem('userToken', response.data.token); // Speichern des erhaltenen Tokens
+            navigate('/CalendarViewPage'); // Navigiere zur App-Seite nach erfolgreicher Anmeldung
         } catch (error) {
-            console.error(error);
+            console.error('Login Fehler', error);
+            setStatusMessage("Fehler beim Einloggen!"); // Zeige eine Fehlermeldung an, wenn der Login fehlschlägt
         }
     };
 
@@ -40,7 +45,7 @@ function Login() {
             <div className={styles.loginNavbar}>
                 <a href="App.tsx">Home</a>
                 <a href="">Neuigkeiten</a>
-                <a href="Login.tsx">Login</a>
+                <a href="Login">Login</a>
             </div>
             <div className={styles.loginBody}>
                 <form onSubmit={handleSubmit} className={styles.formLogin}>
@@ -48,31 +53,35 @@ function Login() {
                     <div className={styles.inputContainer}>
                         <input
                             type="text"
-                            id="username"
+                            name="username" // geändert von id zu name
                             placeholder="Benutzername"
                             autoComplete="off"
+                            value={formData.username}
                             onChange={handleInputChange}
-                        /><br />
+                        /><br/>
                     </div>
                     <div className={styles.inputContainer}>
                         <input
                             type="password"
-                            id="password"
+                            name="password" // geändert von id zu name
                             placeholder="Passwort"
                             autoComplete="off"
+                            value={formData.password}
                             onChange={handleInputChange}
-                        /><br />
+                        /><br/>
                     </div>
                     <div className={styles.buttonContainer}>
                         <button type="submit" className={styles.loginButton}>
                             LogIn
-                        </button><br />
+                        </button>
+                        <br/>
                     </div>
                 </form>
                 <div className={styles.signup}>
                     <button onClick={() => navigate("/Register")}>
                         Noch kein Account? Jetzt Registrieren
-                    </button><br />
+                    </button>
+                    <br/>
                 </div>
                 {statusMessage && (
                     <div className={styles.statusMessage}>

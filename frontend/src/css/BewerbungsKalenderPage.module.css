@@ -1,6 +1,6 @@
-/* CalendarEditPage.module.css */
+/* BewerbungsKalenderPage.module.css */
 
-.calendarEditPage {
+.bewerbungsKalenderPage {
     font-family: Arial, sans-serif;
     padding: 20px;
 }
@@ -49,45 +49,27 @@ h1 {
     padding: 5px;
 }
 
-.calendarCorner {
-    flex: 1;
-}
-
 .calendarDay {
     flex: 1;
     text-align: center;
 }
 
-.calendarRow {
+.bewerbungenContainer {
     display: flex;
-    align-items: center;
-    margin-top: 10px;
+    flex-wrap: wrap;
 }
 
-.userName {
-    font-weight: bold;
-    flex: 1;
-    padding: 5px;
-    background-color: #f0f0f0;
-}
-
-.calendarCell {
-    flex: 1;
-    border: 1px solid #ccc;
-    padding: 10px;
-    margin-right: 10px;
-}
-
-.shift {
+.bewerbung {
     border: 1px solid #ddd;
     padding: 10px;
-    margin: 5px 0;
+    margin: 5px;
+    flex: 1;
 }
 
-.shift div {
+.bewerbung div {
     margin-bottom: 5px;
 }
 
-.shift strong {
+.bewerbung strong {
     font-weight: bold;
 }

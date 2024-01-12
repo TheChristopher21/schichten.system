@@ -1,7 +1,18 @@
 import Header from "./components/Header";
-import { Shift, ShiftType } from "./components/Shift";
-import { Popup } from "./components/Popup"
+// In components.tsx oder einem anderen Dienst-Modul
+
+import axios from 'axios';
+
+export const authenticatedAxios = axios.create();
+
+authenticatedAxios.interceptors.request.use((config) => {
+    const token = localStorage.getItem('userToken');
+    config.headers.Authorization = token ? `Bearer ${token}` : '';
+    return config;
+});
+
+
 
 export {
-    Header, Shift, Popup, ShiftType
+    Header
 }
