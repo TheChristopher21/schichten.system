@@ -4,7 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="27653667-0316-436e-83f6-d03be46b95e0" name="Changes" comment="Merge remote-tracking branch 'origin/main'" />
+    <list default="true" id="27653667-0316-436e-83f6-d03be46b95e0" name="Changes" comment="Merge remote-tracking branch 'origin/main'">
+      <change beforePath="$PROJECT_DIR$/frontend/src/ShiftDetails.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/index.tsx" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -49,7 +52,7 @@
     "node.js.selected.package.eslint": "(autodetect)",
     "node.js.selected.package.tslint": "(autodetect)",
     "nodejs_package_manager_path": "npm",
-    "ts.external.directory.path": "/home/chris/Desktop/schichten.system/frontend/node_modules/typescript/lib",
+    "ts.external.directory.path": "C:\\Users\\siefe\\IdeaProjects\\schichten.system\\frontend\\node_modules\\typescript\\lib",
     "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
@@ -84,6 +87,7 @@
       <workItem from="1704732225007" duration="32000" />
       <workItem from="1704732401104" duration="9000" />
       <workItem from="1705065819012" duration="2000" />
+      <workItem from="1705073396444" duration="119000" />
     </task>
     <task id="LOCAL-00001" summary="db">
       <option name="closed" value="true" />
@@ -149,7 +153,15 @@
       <option name="project" value="LOCAL" />
       <updated>1704732252441</updated>
     </task>
-    <option name="localTasksCounter" value="9" />
+    <task id="LOCAL-00009" summary="Merge remote-tracking branch 'origin/main'">
+      <option name="closed" value="true" />
+      <created>1705073437575</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1705073437575</updated>
+    </task>
+    <option name="localTasksCounter" value="10" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
