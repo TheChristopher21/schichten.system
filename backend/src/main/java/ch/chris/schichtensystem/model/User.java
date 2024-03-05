@@ -1,5 +1,6 @@
 package ch.chris.schichtensystem.model;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -7,77 +8,87 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
 
+import jakarta.persistence.*;
+
 @Entity
-@Table(name="user")
+@Table(name = "user")
 public class User {
 
-	@Id
-	@GeneratedValue(strategy=GenerationType.IDENTITY)
-	private int id;
-	
-	@NotBlank(message = "Username cannot be blank")
-	private String username;
-	
-	@NotBlank(message = "Firstname cannot be blank")
-	private String firstname;
-	
-	@NotBlank(message = "Lastname cannot be blank")
-	private String lastname;
-	
-	@NotBlank(message = "Email cannot be blank")
-	private String email;
-	
-	@NotBlank(message = "Password cannot be blank")
-	private String password;
-	
-	public int getId() {
-		return id;
-	}
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-	public void setId(int id) {
-		this.id = id;
-	}
+    @Column(nullable = false, unique = true)
+    private String email;
 
-	public String getUsername() {
-		return username;
-	}
+    private String firstname;
 
-	public void setUsername(String username) {
-		this.username = username;
-	}
+    private String lastname;
 
-	public String getFirstname() {
-		return firstname;
-	}
+    @Column(nullable = false)
+    private String password;
 
-	public void setFirstname(String firstname) {
-		this.firstname = firstname;
-	}
+    @Column(nullable = false, unique = true)
+    private String username;
 
-	public String getLastname() {
-		return lastname;
-	}
+    @Column(name = "api_key", unique = true)
+    private String apiKey;
 
-	public void setLastname(String lastname) {
-		this.lastname = lastname;
-	}
+    // Getter und Setter
 
-	public String getEmail() {
-		return email;
-	}
+    public Long getId() {
+        return id;
+    }
 
-	public void setEmail(String email) {
-		this.email = email;
-	}
+    public void setId(Long id) {
+        this.id = id;
+    }
 
-	public String getPassword() {
-		return password;
-	}
+    public String getEmail() {
+        return email;
+    }
 
-	public void setPassword(String password) {
-		this.password = password;
-	}
+    public void setEmail(String email) {
+        this.email = email;
+    }
 
+    public String getFirstname() {
+        return firstname;
+    }
 
-	
+    public void setFirstname(String firstname) {
+        this.firstname = firstname;
+    }
+
+    public String getLastname() {
+        return lastname;
+    }
+
+    public void setLastname(String lastname) {
+        this.lastname = lastname;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public String getApiKey() {
+        return apiKey;
+    }
+
+    public void setApiKey(String apiKey) {
+        this.apiKey = apiKey;
+    }
 }

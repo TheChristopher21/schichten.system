@@ -1,75 +1,39 @@
-/* BewerbungsKalenderPage.module.css */
-
 .bewerbungsKalenderPage {
-    font-family: Arial, sans-serif;
-    padding: 20px;
-}
-
-.registerNavbar {
-    background-color: #333;
-    color: #fff;
-    padding: 10px;
-    text-align: right;
-}
-
-.registerNavbar a {
-    color: #fff;
-    text-decoration: none;
-    margin-left: 10px;
-}
-
-h1 {
-    font-size: 24px;
-    margin-top: 20px;
+    /* ... bisherige Stile ... */
 }
 
 .weekNavigation {
-    display: flex;
-    justify-content: space-between;
-    margin-top: 10px;
-}
-
-.weekNavigation button {
-    background-color: #007bff;
-    color: #fff;
-    border: none;
-    padding: 5px 10px;
-    cursor: pointer;
+    /* ... bisherige Stile ... */
 }
 
 .calendar {
-    margin-top: 20px;
+    display: grid;
+    grid-template-columns:
+repeat(7, 1fr); /* Erstellt 7 Spalten (für jeden Wochentag eine) /
+gap: 10px; / Abstand zwischen den Spalten */
 }
 
-.calendarHeader {
-    display: flex;
-    background-color: #007bff;
-    color: #fff;
-    font-weight: bold;
-    padding: 5px;
+.calendarDayContainer {
+    border: 1px solid #ddd; /* Rahmen um jeden Tag /
+padding: 10px; / Innenabstand /
+display: flex;
+flex-direction: column; / Elemente vertikal anordnen */
 }
 
 .calendarDay {
-    flex: 1;
-    text-align: center;
+    font-weight: bold; /* Stil für das Datum /
+margin-bottom: 10px; / Abstand zwischen Datum und Schichten */
 }
 
-.bewerbungenContainer {
+.offeneSchichten {
     display: flex;
-    flex-wrap: wrap;
+    flex-direction: column; /* Schichten vertikal anordnen */
 }
 
-.bewerbung {
-    border: 1px solid #ddd;
-    padding: 10px;
-    margin: 5px;
-    flex: 1;
+.shift {
+    padding: 5px;
+    margin-bottom: 5px; /* Abstand zwischen den Schichten /
+background-color: #f8f8f8; / Hintergrundfarbe für Schichten /
+border-radius: 5px; / Abgerundete Ecken */
 }
 
-.bewerbung div {
-    margin-bottom: 5px;
-}
-
-.bewerbung strong {
-    font-weight: bold;
-}

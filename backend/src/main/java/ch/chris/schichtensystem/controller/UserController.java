@@ -1,6 +1,8 @@
 package ch.chris.schichtensystem.controller;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -8,25 +10,34 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import ch.chris.schichtensystem.model.User;
-import ch.chris.schichtensystem.model.UserRepoitory;
+import ch.chris.schichtensystem.model.UserRepository;
+import ch.chris.schichtensystem.util.AuthenticationManager;
+import de.mkammerer.argon2.Argon2;
+import de.mkammerer.argon2.Argon2Factory;
 import jakarta.validation.Valid;
+
+
 
 @RestController
 @RequestMapping(path = "/user")
 public class UserController {
 
+	  @Autowired
+	    private UserRepository userRepository; // Korrekter Name
+    
     @Autowired
-    private UserRepoitory userRepoitory;
+    private AuthenticationManager authenticationManager;
 
     @GetMapping("/userdetails")
     public ResponseEntity<List<User>> getAllUserDetails() {
-        List<User> userDetails = (List<User>) userRepoitory.findAll();
+        List<User> userDetails = (List<User>) userRepository.findAll();
         
         if (!userDetails.isEmpty()) {
             return ResponseEntity.ok(userDetails);
@@ -47,25 +58,56 @@ public class UserController {
     }
     
     
-    @PostMapping("register")
+    @PostMapping("/register")
     public ResponseEntity<String> createUser(@Valid @RequestBody User user) {
-        if (userRepoitory.findByUsername(user.getUsername()).isPresent()) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Username already exists");
-        }
-        userRepoitory.save(user);
-        return ResponseEntity.ok("Created user");
+    if (userRepository.findByUsername(user.getUsername()).isPresent()) {
+    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Username already exists");
     }
 
-    @PostMapping("login")
-    public ResponseEntity<String> loginUser(@RequestBody User user) {
-        User existingUser = userRepoitory.findByUsername(user.getUsername()).orElse(null);
+ 
+    Argon2 argon2 = Argon2Factory.create();
+    try {
+        // Hashing des Passworts
+        String hash = argon2.hash(10, 65536, 1, user.getPassword().toCharArray());
+        user.setPassword(hash);
 
-        // Check if the user exists and if the password matches
-        if (existingUser != null && existingUser.getPassword().equals(user.getPassword())) {
-            return ResponseEntity.ok("Login successful");
-        } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid credentials");
-        }
+        // Speichern des Benutzers mit gehashtem Passwort
+        userRepository.save(user);
+        return ResponseEntity.ok("User created");
+    } finally {
+        // Löschen des Passworts aus dem Speicher
+        argon2.wipeArray(user.getPassword().toCharArray());
+    }
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<?> loginUser(@RequestBody User user) {
+        User existingUser = userRepository.findByUsername(user.getUsername()).orElse(null);
         
+        if (existingUser != null) {
+            Argon2 argon2 = Argon2Factory.create();
+            if (argon2.verify(existingUser.getPassword(), user.getPassword().toCharArray())) {
+                String apiKey = UUID.randomUUID().toString();
+                existingUser.setApiKey(apiKey);
+                userRepository.save(existingUser);
+                
+                HashMap<String, String> responseBody = new HashMap<>();
+                responseBody.put("token", apiKey);
+                return ResponseEntity.ok(responseBody);
+            }
+        }
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid credentials");
+    }
+
+    @GetMapping("/getUsername")
+    public ResponseEntity<String> getUsername(@RequestHeader("Authorization") String authHeader) {
+        try {
+            String apiKey = authHeader.substring(7);
+            String username = authenticationManager.getUsernameFromApiKey(apiKey);
+            return ResponseEntity.ok(username);
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body("Ein Fehler ist aufgetreten: " + e.getMessage());
+        }
     }
 }
+

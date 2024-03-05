@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, {useEffect, useState} from "react";
 import styles from './css/Register.module.css';
 import { useNavigate } from 'react-router-dom';
 import axios from "axios";
@@ -13,7 +13,25 @@ function Registrieren() {
         password: ""
     });
     const [statusMessage, setStatusMessage] = useState("");
+    const [isLoggedIn, setIsLoggedIn] = useState(false);
+    const [isSpecialUser, setIsSpecialUser] = useState(false);
 
+
+    useEffect(() => {
+        const token = localStorage.getItem('userToken');
+        const userRole = localStorage.getItem('userRole'); // Angenommen, die Benutzerrolle wird bei der Anmeldung gespeichert
+
+        setIsLoggedIn(!!token);
+        setIsSpecialUser(userRole === 'special'); // 'special' ist ein Platzhalter für die Rolle des speziellen Benutzers
+    }, []);
+
+    const handleLogout = () => {
+        localStorage.removeItem('userToken');
+        localStorage.removeItem('userRole');
+        setIsLoggedIn(false);
+        setIsSpecialUser(false);
+        navigate('/'); // Zurück zur Startseite navigieren
+    };
     const handleRegistration = async () => {
         try {
             const response = await axios.post("http://localhost:8080/user/register", formData);
@@ -43,8 +61,12 @@ function Registrieren() {
         <div className={styles.registerContainer}>
             <div className={styles.registerNavbar}>
                 <a href="App.tsx">Home</a>
-                <a href="">Neuigkeiten</a>
-                <a href="Login.tsx">Login</a>
+                {isSpecialUser && <a href="CalendarEditPage">EditPage</a>}
+                {isSpecialUser && <a href="BewerbungsKalenderPage">Ausstehende Bewerbungen</a>}
+                {!isLoggedIn && <a href="Login">Login</a>}
+                {!isLoggedIn && <a href="Register">Registrieren</a>}
+                {isLoggedIn && <button onClick={handleLogout}>Logout</button>}
+                {isLoggedIn && <a href="CalendarViewPage">Mitarbeiter Kalender</a>}
             </div>
             <div className={styles.registerBody}>
                 <form onSubmit={handleSubmit}>

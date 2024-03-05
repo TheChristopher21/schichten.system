@@ -5,24 +5,8 @@ import axios from "axios";
 
 function Login() {
     const navigate = useNavigate();
-    const [formData, setFormData] = useState({
-        username: "",
-        password: ""
-    });
+    const [formData, setFormData] = useState({ username: "", password: "" });
     const [statusMessage, setStatusMessage] = useState("");
-    const [username, setUsername] = useState(''); // Zustand für Benutzername
-    const [password, setPassword] = useState(''); // Zustand für Passwort
-
-    const handleLogin = async () => {
-        try {
-            const response = await axios.post("http://localhost:8080/user/login", formData);
-            console.log(response.data);
-            navigate('/CalendarViewPage'); // Navigiere zur App-Seite nach erfolgreicher Anmeldung
-        } catch (error) {
-            console.error(error);
-            setStatusMessage("Fehler beim Einloggen!"); // Zeige eine Fehlermeldung an, wenn der Login fehlschlägt
-        }
-    };
 
     const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -32,20 +16,30 @@ function Login() {
         event.preventDefault();
         try {
             const response = await axios.post("http://localhost:8080/user/login", formData);
-            localStorage.setItem('userToken', response.data.token); // Speichern des erhaltenen Tokens
-            navigate('/CalendarViewPage'); // Navigiere zur App-Seite nach erfolgreicher Anmeldung
+            // Stellen Sie sicher, dass Sie auf den API-Key in der Struktur der Antwort korrekt zugreifen.
+            // Es wird angenommen, dass der API-Key unter response.data.token verfügbar ist.
+            // Überprüfen Sie die tatsächliche Struktur der Antwort Ihres Servers.
+            if (response.data && response.data.token) {
+                localStorage.setItem('apikey', response.data.token);
+                // Annahme: Die Navigation zur Startseite erfolgt mit '/start' und nicht '/Start'.
+                // Passen Sie den Pfad entsprechend Ihrer Routing-Konfiguration an.
+                navigate('/CalendarViewPage');
+            } else {
+                // Fall, wenn keine Token in der Antwort sind (z.B. falsche Anmeldeinformationen)
+                setStatusMessage("Login fehlgeschlagen. Bitte überprüfen Sie Ihre Anmeldeinformationen.");
+            }
         } catch (error) {
             console.error('Login Fehler', error);
-            setStatusMessage("Fehler beim Einloggen!"); // Zeige eine Fehlermeldung an, wenn der Login fehlschlägt
+            setStatusMessage("Fehler beim Einloggen. Bitte versuchen Sie es später erneut.");
         }
     };
 
     return (
         <div className={styles.loginContainer}>
             <div className={styles.loginNavbar}>
-                <a href="App.tsx">Home</a>
-                <a href="">Neuigkeiten</a>
-                <a href="Login">Login</a>
+                <a href="/">Home</a> {/* Hier sollte der Pfad angepasst werden */}
+                <a href="/news">Neuigkeiten</a> {/* Angenommen, es gibt eine Route '/news' */}
+                <a href="/login">Login</a> {/* Annahme: Pfadkorrektur */}
             </div>
             <div className={styles.loginBody}>
                 <form onSubmit={handleSubmit} className={styles.formLogin}>
@@ -53,7 +47,7 @@ function Login() {
                     <div className={styles.inputContainer}>
                         <input
                             type="text"
-                            name="username" // geändert von id zu name
+                            name="username"
                             placeholder="Benutzername"
                             autoComplete="off"
                             value={formData.username}
@@ -63,7 +57,7 @@ function Login() {
                     <div className={styles.inputContainer}>
                         <input
                             type="password"
-                            name="password" // geändert von id zu name
+                            name="password"
                             placeholder="Passwort"
                             autoComplete="off"
                             value={formData.password}
@@ -78,7 +72,7 @@ function Login() {
                     </div>
                 </form>
                 <div className={styles.signup}>
-                    <button onClick={() => navigate("/Register")}>
+                    <button onClick={() => navigate("/register")}>
                         Noch kein Account? Jetzt Registrieren
                     </button>
                     <br/>

@@ -1,21 +1,20 @@
-import React, { useState, useEffect } from 'react';
+import React, {useState, useEffect, useCallback} from 'react';
 import axios from 'axios';
 import styles from './css/CalendarEditPage.module.css';
 
 interface Shift {
-    id: number | null;
+    id: number | null | boolean;
     shiftid: string;
     date: string;
     text: string;
-    userId?: string;
+    user_id: string; // Aktualisiert, um der Datenbank zu entsprechen
 }
 
-// Typdefinition für den neuen Schichtzustand
 interface NewShift {
     shiftid: string;
     date: string;
     text: string;
-    userId: string; // Hier wird nun 'userId' als Teil des Typs definiert
+    user_id: string; // Hier wird nun 'user_id' als Teil des Typs definiert
 }
 
 interface User {
@@ -29,40 +28,55 @@ const CalendarEditPage: React.FC = () => {
     const [users, setUsers] = useState<User[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
-    const [newShift, setNewShift] = useState<NewShift>({ shiftid: '', date: '', text: '', userId: '' });
+    const [newShift, setNewShift] = useState<NewShift>({ shiftid: '', date: '', text: '', user_id: '' });
     const [currentWeek, setCurrentWeek] = useState(new Date());
     const [isEditing, setIsEditing] = useState(false);
     const [editingShift, setEditingShift] = useState<Shift | null>(null);
+    const apiKey = localStorage.getItem('apikey'); // Anpassung an korrekten Schlüssel
 
 
 
+    const api = axios.create({
+        baseURL: 'http://localhost:8080',
+        headers: {
+            Authorization: `Bearer ${apiKey}`,
+            'Content-Type': 'application/json',
+        },
+    });
+
+
+    const handleLogout = () => {
+        localStorage.removeItem('apikey'); // Entfernen des API-Keys beim Logout
+        // Weiterleitung des Benutzers oder Aktualisierung des Zustands
+    };
 
 
     useEffect(() => {
         const fetchData = async () => {
             try {
                 const [shiftsResponse, usersResponse] = await Promise.all([
-                    axios.get<Shift[]>('http://localhost:8080/shift'),
-                    axios.get<User[]>('http://localhost:8080/user/userdetails')
+                    api.get<Shift[]>('/shift'),
+                    api.get<User[]>('/user/userdetails')
                 ]);
+                const modifiedUsers = [{ id: 'open', firstname: 'Offene', lastname: 'Schichten' }, ...usersResponse.data];
+                setUsers(modifiedUsers);
                 setShifts(shiftsResponse.data);
-                setUsers(usersResponse.data);
             } catch (error) {
-                setError('Error fetching data');
-                console.error('Error fetching data: ', error);
+                setError('Fehler beim Abrufen der Daten');
+                console.error('Fehler beim Abrufen der Daten: ', error);
             } finally {
                 setLoading(false);
             }
         };
         fetchData();
-    }, []);
+    }, [api]); // api in Abhängigkeiten aufnehmen
 
-    const handleDeleteShift = async (shiftId: number | null) => {
-        // Zeige ein Bestätigungsdialog an
-        const confirmDelete = window.confirm("Möchten Sie diese Schicht wirklich löschen?");
-        if (confirmDelete) {
+
+
+    const handleDeleteShift = async (shiftId: number | boolean | null) => {
+        if (confirm("Möchten Sie diese Schicht wirklich löschen?")) {
             try {
-                await axios.delete(`http://localhost:8080/shift/${shiftId}`);
+                await api.delete(`/shift/${shiftId}`);
                 setShifts(shifts.filter(shift => shift.id !== shiftId));
             } catch (error) {
                 console.error('Fehler beim Löschen der Schicht', error);
@@ -71,22 +85,63 @@ const CalendarEditPage: React.FC = () => {
     };
 
 
+    class Modal extends React.Component<{ onClose: any, children: any }> {
+        render() {
+            let {onClose, children} = this.props;
+            return (
+                <div className={styles.modal}>
+                    <div className={styles.modalContent}>
+                        <button onClick={onClose} className={styles.closeButton}>&times;</button>
+                        {children}
+                    </div>
+                </div>
+            );
+        }
+    }
+
+    const getFormattedDate = (date: Date) => {
+        return date.toISOString().split('T')[0];
+    };
+
+
+    const isShiftOpen = (shift: Shift) => {
+        // Zuerst prüfen, ob userId definiert ist und dann als Zahl vergleichen
+        return shift.user_id !== undefined && parseInt(shift.user_id) === -1;
+    };
+
+
+    const shiftToCreate = {
+        ...newShift,
+        // Verwenden Sie parseInt, um sicherzustellen, dass userId eine Zahl ist
+        userId: newShift.user_id === 'open' ? -1 : parseInt(newShift.user_id)
+    };
+
+
+    const handleInputChange = useCallback((e: { target: { name: any; value: any; }; }) => {
+        setEditingShift(prevShift => {
+            if (!prevShift) return null;
+
+            return {
+                ...prevShift,
+                [e.target.name]: e.target.value || '' // Stellen Sie sicher, dass keine undefined-Werte zugewiesen werden
+            };
+        });
+    }, []);
 
 
     const handleEditShift = (shift: Shift) => {
         setIsEditing(true);
-        const editedShift = {
-            ...shift,
-            id: shift.id ?? null // Stellt sicher, dass id entweder number oder null ist, aber nicht undefined
-        };
-        setEditingShift(editedShift);
+        setEditingShift(shift);
     };
 
-
     const handleUpdateShift = async () => {
-        if (editingShift && editingShift.id !== null) { // Überprüfen Sie, ob editingShift nicht null ist und eine gültige ID hat
+        if (editingShift && editingShift.id !== null) {
+            const shiftToUpdate = {
+                ...editingShift,
+                userId: editingShift.user_id === 'open' ? '-1' : editingShift.user_id
+            };
             try {
-                const response = await axios.put(`http://localhost:8080/shift/${editingShift.id}`, editingShift);
+                const response = await axios.put(`http://localhost:8080/shift/${editingShift.id}`, shiftToUpdate);
                 setShifts(shifts.map(shift => shift.id === editingShift.id ? response.data : shift));
                 setIsEditing(false);
                 setEditingShift(null);
@@ -95,6 +150,8 @@ const CalendarEditPage: React.FC = () => {
             }
         }
     };
+
+
 
 
     const getDaysInWeek = (date: Date) => {
@@ -110,18 +167,33 @@ const CalendarEditPage: React.FC = () => {
         setCurrentWeek(new Date(currentWeek.setDate(currentWeek.getDate() + 7)));
     };
 
-    const daysInWeek = getDaysInWeek(new Date(currentWeek));
+    const daysInWeek = getDaysInWeek(new Date(currentWeek)).map(getFormattedDate);
+
+// Aktualisierte authenticateUser Funktion
+
+
 
     const addShift = async (event: React.FormEvent) => {
         event.preventDefault();
+        const userIdValue = newShift.user_id === 'open' ? -1 : parseInt(newShift.user_id)
+
+        const shiftToCreate = {
+            shiftid: newShift.shiftid,
+            date: newShift.date,
+            text: newShift.text,
+            user: newShift.user_id === 'open' ? null : { id: parseInt(newShift.user_id) } // Annahme, das Backend erwartet ein User-Objekt
+        };
+
         try {
-            const response = await axios.post('http://localhost:8080/shift', newShift);
+            const response = await api.post('/shift', shiftToCreate);
             setShifts([...shifts, response.data]);
-            setNewShift({ shiftid: '', date: '', text: '', userId: '' });
+            setNewShift({ shiftid: '', date: '', text: '', user_id: '' });
         } catch (error) {
-            console.error('Fehler beim Hinzufügen der Schicht', error);
+            console.error('Fehler beim Hinzufügen der Schicht:', error);
         }
     };
+
+
     if (loading) {
         return <div>Loading...</div>;
     }
@@ -130,13 +202,14 @@ const CalendarEditPage: React.FC = () => {
         return <div>Error: {error}</div>;
     }
 
+
+
     return (
         <div className={styles.calendarEditPage}>
             <div className={styles.registerNavbar}>
                 <a href="App.tsx">Home</a>
                 <a href="CalendarViewPage">Mitarbeiter Kalender</a>
                 <a href="BewerbungsKalenderPage">Ausstehende Bewerbungen</a>
-
             </div>
             <h1>Shift Calendar</h1>
             <div className={styles.weekNavigation}>
@@ -164,8 +237,8 @@ const CalendarEditPage: React.FC = () => {
                     onChange={(e) => setNewShift({...newShift, text: e.target.value})}
                 />
                 <select
-                    value={newShift.userId}
-                    onChange={(e) => setNewShift({...newShift, userId: e.target.value})}
+                    value={newShift.user_id}
+                    onChange={(e) => setNewShift({...newShift, user_id: e.target.value})}
                 >
                     <option value="">Mitarbeiter auswählen</option>
                     {users.map((user) => (
@@ -175,12 +248,39 @@ const CalendarEditPage: React.FC = () => {
                 <button type="submit">Schicht hinzufügen</button>
             </form>
 
+            {isEditing && editingShift && (
+                <Modal onClose={() => setIsEditing(false)}>
+                    <div className={styles.editShiftForm}>
+                        <h2>Schicht bearbeiten</h2>
+                        <input
+                            type="text"
+                            value={editingShift.shiftid}
+                            onChange={(e) => setEditingShift({...editingShift, shiftid: e.target.value})}
+                        />
+                        <input
+                            type="date"
+                            value={editingShift.date}
+                            onChange={(
+                                e) => setEditingShift({...editingShift, date: e.target.value})}
+                        />
+                        <input
+                            type="text"
+                            value={editingShift.text}
+                            onChange={(e) => setEditingShift({...editingShift, text: e.target.value})}
+                        />
+                        <div className={styles.editShiftButtons}>
+                            <button onClick={handleUpdateShift}>Speichern</button>
+                            <button onClick={() => setIsEditing(false)}>Abbrechen</button>
+                        </div>
+                    </div>
+                </Modal>
+            )}
             <div className={styles.calendar}>
                 <div className={styles.calendarHeader}>
                     <div className={styles.calendarCorner}></div>
                     {daysInWeek.map((day, index) => (
                         <div key={index} className={styles.calendarDay}>
-                            {day.toLocaleDateString('de-DE', {weekday: 'short', day: 'numeric', month: 'numeric'})}
+                            {day}
                         </div>
                     ))}
                 </div>
@@ -190,7 +290,9 @@ const CalendarEditPage: React.FC = () => {
                         <div className={styles.userName}>{user.firstname} {user.lastname}</div>
                         {daysInWeek.map((day, index) => (
                             <div key={index} className={styles.calendarCell}>
-                                {shifts.filter(shift => shift.userId === user.id && shift.date === day.toISOString().split('T')[0])
+                                {shifts.filter(shift =>
+                                    (user.id === 'open' ? isShiftOpen(shift) : shift.user_id === user.id) &&
+                                    shift.date === day)
                                     .map((shift, shiftIndex) => (
                                         <div key={shiftIndex} className={styles.shift}>
                                             <div><strong>ID:</strong> {shift.shiftid}</div>
@@ -207,7 +309,9 @@ const CalendarEditPage: React.FC = () => {
                 ))}
             </div>
         </div>
+
     );
+
 };
 
 export default CalendarEditPage;

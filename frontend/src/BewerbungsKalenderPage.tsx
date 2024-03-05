@@ -14,21 +14,52 @@ interface Bewerbung {
 const BewerbungsKalenderPage: React.FC = () => {
     const [bewerbungen, setBewerbungen] = useState<Bewerbung[]>([]);
     const [currentWeek, setCurrentWeek] = useState(new Date());
+    const [isLoggedIn, setIsLoggedIn] = useState(false);
 
     useEffect(() => {
-        const fetchBewerbungen = async () => {
-            try {
-                const response = await axios.get<Bewerbung[]>('http://localhost:8080/bewerbungen');
-                setBewerbungen(response.data);
-            } catch (error) {
-                console.error('Fehler beim Abrufen der Bewerbungen:', error);
+        checkLoginStatus().then(() => {
+            if (isLoggedIn) {
+                fetchBewerbungen();
             }
-        };
+        });
+    }, [currentWeek, isLoggedIn]);
 
-        fetchBewerbungen();
-    }, [currentWeek]); // Abhängigkeit von currentWeek, um die Daten bei Änderung der Woche neu zu laden
+    const checkLoginStatus = async () => {
+        const token = localStorage.getItem('token');
+        if (token) {
+            try {
+                const response = await axios.get('http://localhost:8080/user/checkToken', {
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                });
+                setIsLoggedIn(response.data.isValid);
+            } catch (error) {
+                console.error('Token-Überprüfungsfehler:', error);
+                setIsLoggedIn(false);
+            }
+        }
+    };
 
 
+    const filteredBewerbungen = bewerbungen.filter(bewerbung => {
+        const bewerbungDatum = new Date(bewerbung.datum);
+        return daysInWeek.some(day => day.toISOString().split('T')[0] === bewerbungDatum.toISOString().split('T')[0]);
+    });
+
+    const fetchBewerbungen = async () => {
+        if (!isLoggedIn) return;
+        try {
+            const response = await axios.get<Bewerbung[]>('http://localhost:8080/bewerbungen/apply', {
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem('token')}`
+                }
+            });
+            setBewerbungen(response.data);
+        } catch (error) {
+            console.error('Fehler beim Abrufen der Bewerbungen:', error);
+        }
+    };
 
     const handlePreviousWeek = () => {
         setCurrentWeek(new Date(currentWeek.setDate(currentWeek.getDate() - 7)));
@@ -71,13 +102,14 @@ const BewerbungsKalenderPage: React.FC = () => {
                 </div>
 
                 <div className={styles.bewerbungenContainer}>
-                    {bewerbungen.map(bewerbung => (
-                        <div key={bewerbung.id}
-                             className={styles.bewerbung}> {/* Achten Sie auf die key-Eigenschaft hier */}
+                    {filteredBewerbungen.map(bewerbung => (
+                        <div key={bewerbung.id} className={styles.bewerbung}>
+                            {/* Bewerbungsdetails */}
                             <div><strong>ID:</strong> {bewerbung.schichtId}</div>
                             <div><strong>Datum:</strong> {bewerbung.datum}</div>
                             <div><strong>Bewerber:</strong> {bewerbung.bewerberName}</div>
                             <div><strong>Anmerkung:</strong> {bewerbung.anmerkung}</div>
+
                         </div>
                     ))}
                 </div>
