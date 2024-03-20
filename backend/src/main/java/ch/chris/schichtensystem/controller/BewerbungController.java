@@ -14,8 +14,6 @@ import org.springframework.web.bind.annotation.RestController;
 import ch.chris.schichtensystem.model.Bewerbung;
 import ch.chris.schichtensystem.model.BewerbungRepository;
 import ch.chris.schichtensystem.util.AuthenticationManager;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
 import jakarta.servlet.http.HttpServletRequest;
 
 @RestController
@@ -31,7 +29,11 @@ public class BewerbungController {
     @PostMapping("/apply")
     public ResponseEntity<String> applyForShift(@RequestBody Bewerbung bewerbung, HttpServletRequest request) {
         try {
-            String apiKey = request.getHeader("Authorization").substring(7);
+            String apiKey = extractApiKey(request);
+
+            if (apiKey == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Ungültiger API-Schlüssel");
+            }
 
             String bewerberName = authenticationManager.getUsernameFromApiKey(apiKey);
 
@@ -46,5 +48,14 @@ public class BewerbungController {
         } catch (Exception e) {
             return ResponseEntity.internalServerError().body("Fehler beim Einreichen der Bewerbung: " + e.getMessage());
         }
+    }
+
+    // Methode zur Extraktion des API-Schlüssels aus dem Header
+    private String extractApiKey(HttpServletRequest request) {
+        String apiKeyHeader = request.getHeader("Authorization");
+        if (apiKeyHeader != null && apiKeyHeader.startsWith("Bearer ")) {
+            return apiKeyHeader.substring(7);
+        }
+        return null;
     }
 }

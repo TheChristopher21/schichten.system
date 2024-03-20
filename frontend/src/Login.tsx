@@ -7,10 +7,7 @@ function Login() {
     const navigate = useNavigate();
     const [formData, setFormData] = useState({ username: "", password: "" });
     const [statusMessage, setStatusMessage] = useState("");
-
-    const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
-        setFormData({ ...formData, [e.target.name]: e.target.value });
-    };
+    const [apiKey, setApiKey] = useState<string | null>(null);
 
     const handleSubmit = async (event: FormEvent) => {
         event.preventDefault();
@@ -21,6 +18,8 @@ function Login() {
                 localStorage.removeItem('apikey');
                 // Speichern Sie den neuen API-Schlüssel im Local Storage
                 localStorage.setItem('apikey', response.data.token);
+                // Setzen Sie den API-Schlüssel im State
+                setApiKey(response.data.token);
                 // Navigieren Sie zur nächsten Seite
                 navigate('/CalendarViewPage');
             } else {
@@ -32,9 +31,27 @@ function Login() {
         }
     };
 
+    // Einrichten des API-Clients mit dem aktuellen API-Schlüssel
+    const api = axios.create({
+        baseURL: 'http://localhost:8080',
+        headers: {
+            Authorization: `Bearer ${apiKey}`,
+            'Content-Type': 'application/json',
+        },
+    });
 
+    api.interceptors.request.use(config => {
+        if (apiKey) {
+            config.headers.Authorization = `Bearer ${apiKey}`;
+        }
+        return config;
+    });
 
-console.log(localStorage)
+    console.log(apiKey)
+
+    const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
+        setFormData({ ...formData, [e.target.name]: e.target.value });
+    };
 
     return (
         <div className={styles.loginContainer}>

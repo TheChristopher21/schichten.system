@@ -76,7 +76,7 @@ const CalendarViewPage: React.FC = () => {
     }, [apiKey]);
 
 
-
+console.log(apiKey)
     const navigate = useNavigate();
 
     const getDaysInWeek = (date: Date) => {
@@ -94,7 +94,8 @@ const CalendarViewPage: React.FC = () => {
                     anmerkung: additionalInfo,
                 };
 
-                const response = await api.post('http://localhost:8080/bewerbungen/apply', applicationData);
+                // Hier wurde die URL geändert
+                const response = await api.post('/bewerbungen/apply', applicationData);
                 console.log('Bewerbung erfolgreich gesendet:', response.data);
             } catch (error) {
                 console.error('Fehler beim Senden der Bewerbung:', error);
