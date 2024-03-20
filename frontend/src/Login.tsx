@@ -16,16 +16,14 @@ function Login() {
         event.preventDefault();
         try {
             const response = await axios.post("http://localhost:8080/user/login", formData);
-            // Stellen Sie sicher, dass Sie auf den API-Key in der Struktur der Antwort korrekt zugreifen.
-            // Es wird angenommen, dass der API-Key unter response.data.token verfügbar ist.
-            // Überprüfen Sie die tatsächliche Struktur der Antwort Ihres Servers.
             if (response.data && response.data.token) {
+                // Vor dem Speichern des neuen API-Schlüssels den vorhandenen entfernen
+                localStorage.removeItem('apikey');
+                // Speichern Sie den neuen API-Schlüssel im Local Storage
                 localStorage.setItem('apikey', response.data.token);
-                // Annahme: Die Navigation zur Startseite erfolgt mit '/start' und nicht '/Start'.
-                // Passen Sie den Pfad entsprechend Ihrer Routing-Konfiguration an.
+                // Navigieren Sie zur nächsten Seite
                 navigate('/CalendarViewPage');
             } else {
-                // Fall, wenn keine Token in der Antwort sind (z.B. falsche Anmeldeinformationen)
                 setStatusMessage("Login fehlgeschlagen. Bitte überprüfen Sie Ihre Anmeldeinformationen.");
             }
         } catch (error) {
@@ -33,6 +31,10 @@ function Login() {
             setStatusMessage("Fehler beim Einloggen. Bitte versuchen Sie es später erneut.");
         }
     };
+
+
+
+console.log(localStorage)
 
     return (
         <div className={styles.loginContainer}>

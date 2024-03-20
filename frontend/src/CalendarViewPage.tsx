@@ -1,15 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import styles from './css/CalendarViewPage.module.css';
-import {useNavigate} from "react-router-dom";
-
-interface Shift {
-    id: number | null ;
-    shiftid: string;
-    date: string;
-    text: string;
-    userId?: string;
-}
+import { useNavigate } from "react-router-dom";
 
 interface User {
     id: string;
@@ -17,7 +9,15 @@ interface User {
     lastname: string;
 }
 
-const CalendarEditPage: React.FC = () => {
+interface Shift {
+    id: number | null;
+    shiftid: string;
+    date: string;
+    text: string;
+    user: any;
+}
+
+const CalendarViewPage: React.FC = () => {
     const [shifts, setShifts] = useState<Shift[]>([]);
     const [users, setUsers] = useState<User[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
@@ -27,17 +27,42 @@ const CalendarEditPage: React.FC = () => {
     const [additionalInfo, setAdditionalInfo] = useState<string>('');
     const [isEditing, setIsEditing] = useState(false);
     const [username, setUsername] = useState("");
+    const [apiKey, setApiKey] = useState<string | null>(null);
+    const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+    const api = axios.create({
+        baseURL: 'http://localhost:8080',
+        headers: {
+            Authorization: `Bearer ${apiKey}`,
+            'Content-Type': 'application/json',
+        },
+    });
+
+
+    api.interceptors.request.use(config => {
+        if (apiKey) {
+            config.headers.Authorization = `Bearer ${apiKey}`;
+        }
+        return config;
+    });
 
     useEffect(() => {
         const fetchData = async () => {
             try {
+                const apiKeyFromLocalStorage = localStorage.getItem('apikey');
+                if (apiKeyFromLocalStorage) {
+                    setApiKey(apiKeyFromLocalStorage);
+                    setIsLoggedIn(true);
+                } else {
+                    setIsLoggedIn(false);
+                }
+
                 const [shiftsResponse, usersResponse] = await Promise.all([
-                    axios.get<Shift[]>('http://localhost:8080/shift'),
-                    axios.get<User[]>('http://localhost:8080/user/userdetails')
+                    api.get<Shift[]>('/shift'),
+                    api.get<User[]>('/user/userdetails')
                 ]);
-                // Fügen Sie "Offene Schichten" als erste Option in der Nutzerliste hinzu
-                const modifiedUsers = [{ id: 'open', firstname: 'Offene', lastname: 'Schichten' }, ...usersResponse.data];
-                setUsers(modifiedUsers);
+
+                setUsers(usersResponse.data);
                 setShifts(shiftsResponse.data);
             } catch (error) {
                 setError('Fehler beim Abrufen der Daten');
@@ -46,96 +71,37 @@ const CalendarEditPage: React.FC = () => {
                 setLoading(false);
             }
         };
+
         fetchData();
-    }, []);
+    }, [apiKey]);
 
 
-    const [isLoggedIn, setIsLoggedIn] = useState(false);
-    const [isSpecialUser, setIsSpecialUser] = useState(false);
+
     const navigate = useNavigate();
 
-    useEffect(() => {
-        const apiKey = localStorage.getItem('apikey');
-        const userRole = localStorage.getItem('userRole');
-
-        setIsLoggedIn(!!apiKey);
-        setIsSpecialUser(userRole === 'special');
-
-        if (apiKey) {
-            fetchUsername(apiKey);
-        }
-        console.log(apiKey)
-    }, []);
-
-    const handleLogout = () => {
-        localStorage.removeItem('apikey');
-        localStorage.removeItem('userRole');
-        setIsLoggedIn(false);
-        setIsSpecialUser(false);
-        navigate('/'); // Navigieren zur Startseite nach dem Logout
+    const getDaysInWeek = (date: Date) => {
+        let start = new Date(date.setDate(date.getDate() - date.getDay()));
+        return new Array(7).fill(null).map((_, index) => new Date(start.getFullYear(), start.getMonth(), start.getDate() + index));
     };
 
-    const fetchUsername = async (token: string) => {
-        try {
-            const response = await axios.get('http://localhost:8080/user/getUsername', {
-                headers: {
-                    Authorization: `Bearer ${token}`
-                }
-            });
-            setUsername(response.data);
-        } catch (error) {
-            console.error('Fehler beim Abrufen des Benutzernamens:', error);
-        }
-    };
-
-    const getUsername = async (token: string) => {
-        try {
-            const response = await axios.get('http://localhost:8080/getUsername', {
-                headers: {
-                    Authorization: `Bearer ${token}`
-                }
-            });
-            return response.data; // Annahme, dass das Backend den Benutzernamen zurückgibt
-        } catch (error) {
-            console.error('Fehler beim Abrufen des Benutzernamens:', error);
-            return null; // oder eine angemessene Fehlerbehandlung
-        }
-    }
 
     const handleApply = async () => {
         if (selectedShift) {
             try {
-                const token = localStorage.getItem('userToken');
-                if (!token) {
-                    console.error('Kein Token gefunden');
-                    return;
-                }
-
-                // Benutzername abrufen
-                const bewerberName = await getUsername(token);
-                if (!bewerberName) {
-                    console.error('Benutzername konnte nicht abgerufen werden');
-                    return;
-                }
-
                 const applicationData = {
                     shiftId: selectedShift.id,
-                    bewerberName: bewerberName,
                     datum: selectedShift.date,
                     anmerkung: additionalInfo,
                 };
 
-                const response = await axios.post('http://localhost:8080/bewerbungen/apply', applicationData, {
-                    headers: {
-                        Authorization: `Bearer ${token}`
-                    }
-                });
+                const response = await api.post('http://localhost:8080/bewerbungen/apply', applicationData);
                 console.log('Bewerbung erfolgreich gesendet:', response.data);
             } catch (error) {
                 console.error('Fehler beim Senden der Bewerbung:', error);
             }
         }
     };
+
 
     const handleClosePopup = () => {
         setSelectedShift(null);
@@ -144,10 +110,6 @@ const CalendarEditPage: React.FC = () => {
 
     const handleApplyClick = (shift: Shift) => {
         setSelectedShift(shift);
-    };
-    const getDaysInWeek = (date: Date) => {
-        let start = new Date(date.setDate(date.getDate() - date.getDay()));
-        return new Array(7).fill(null).map((_, index) => new Date(start.getFullYear(), start.getMonth(), start.getDate() + index));
     };
 
     const handlePreviousWeek = () => {
@@ -160,6 +122,12 @@ const CalendarEditPage: React.FC = () => {
 
     const daysInWeek = getDaysInWeek(new Date(currentWeek)).map(date => date.toISOString().split('T')[0]);
 
+    const handleLogout = () => {
+        localStorage.removeItem('userToken');
+        setIsLoggedIn(false);
+        navigate('/');
+    };
+
     if (loading) {
         return <div>Loading...</div>;
     }
@@ -168,18 +136,13 @@ const CalendarEditPage: React.FC = () => {
         return <div>Error: {error}</div>;
     }
 
-    const isShiftOpen = (shift: Shift) => {
-        return shift.userId === undefined || parseInt(shift.userId) === -1;
-    };
-
-
-
     return (
         <div className={styles.calendarEditPage}>
             <div className={styles.registerNavbar}>
                 <a href="/">Home</a>
                 {isLoggedIn && <a href="/CalendarEditPage">Kalender Bearbeiten</a>}
-                {isSpecialUser && <a href="/BewerbungsKalenderPage">Ausstehende Bewerbungen</a>}
+                {/* Die folgende Zeile wurde geändert */}
+                {isLoggedIn  && <a href="/BewerbungsKalenderPage">Ausstehende Bewerbungen</a>}
                 {!isLoggedIn && <a href="/Login">Login</a>}
                 {!isLoggedIn && <a href="/Register">Registrieren</a>}
                 {isLoggedIn && <button onClick={handleLogout}>Logout</button>}
@@ -209,9 +172,8 @@ const CalendarEditPage: React.FC = () => {
                         <div className={styles.userName}>{user.firstname} {user.lastname}</div>
                         {daysInWeek.map((day, index) => (
                             <div key={index} className={styles.calendarCell}>
-                                     {shifts.filter(shift =>
-                                    (user.id === 'open' ? isShiftOpen(shift) : shift.userId === user.id) &&
-                                    shift.date === day)
+                                {shifts.filter(shift =>
+                                    ((shift.user ? shift.user.id : "welp") === user.id && shift.date === day))
                                     .map((shift, shiftIndex) => (
                                         <div key={shiftIndex} className={styles.shift}>
                                             <div><strong>ID:</strong> {shift.shiftid}</div>
@@ -219,8 +181,7 @@ const CalendarEditPage: React.FC = () => {
                                             <div><strong>Text:</strong> {shift.text}</div>
                                             <button onClick={() => handleApplyClick(shift)}>Bewerben</button>
                                         </div>
-                                    ))
-                                }
+                                    ))}
                             </div>
                         ))}
                     </div>
@@ -240,11 +201,11 @@ const CalendarEditPage: React.FC = () => {
                     />
                     <button onClick={handleApply}>Jetzt bewerben</button>
                     <button onClick={handleClosePopup}>Abbrechen</button> {/* Abbrechen-Button */}
-
                 </div>
             )}
         </div>
     );
+
 };
 
-export default CalendarEditPage;
+export default CalendarViewPage;

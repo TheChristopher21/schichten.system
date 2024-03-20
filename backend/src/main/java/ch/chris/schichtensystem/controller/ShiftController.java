@@ -1,5 +1,7 @@
 package ch.chris.schichtensystem.controller;
 
+import java.sql.Date;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -10,7 +12,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ch.chris.schichtensystem.model.Shift;
+import ch.chris.schichtensystem.model.ShiftDTO;
 import ch.chris.schichtensystem.model.ShiftRepository;
+import ch.chris.schichtensystem.model.UserRepository;
 import ch.chris.schichtensystem.util.AuthenticationManager;
 
 @CrossOrigin(origins = "http://localhost:3000")
@@ -19,10 +23,12 @@ import ch.chris.schichtensystem.util.AuthenticationManager;
 public class ShiftController {
 
     private final ShiftRepository shiftRepository;
+    private final UserRepository userRepository;
 
     @Autowired
-    public ShiftController(ShiftRepository shiftRepository) {
+    public ShiftController(ShiftRepository shiftRepository, UserRepository userRepository) {
         this.shiftRepository = shiftRepository;
+        this.userRepository = userRepository;
     }
 
     @GetMapping("/offene")
@@ -44,9 +50,17 @@ public class ShiftController {
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
-    @PostMapping
-    public ResponseEntity<Shift> createShift(@Validated @RequestBody Shift shift) {
-        Shift createdShift = shiftRepository.save(shift);
+	@PostMapping
+    public ResponseEntity<Shift> createShift(@RequestBody ShiftDTO shift) {
+		System.out.println(shift);
+    	Shift newShift = new Shift();
+    	newShift.setDate(LocalDate.parse(shift.date()));
+    	newShift.setText(shift.text());
+    	newShift.setShiftid(shift.shiftid());
+    	newShift.setUser(userRepository.findById(shift.userid()).orElse(null));
+    	newShift.setId(1000000000L);
+    	
+        Shift createdShift = shiftRepository.save(newShift);
         return new ResponseEntity<>(createdShift, HttpStatus.CREATED);
     }
 

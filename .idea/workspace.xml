@@ -5,35 +5,14 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="27653667-0316-436e-83f6-d03be46b95e0" name="Changes" comment="Merge remote-tracking branch 'origin/main'">
-      <change afterPath="$PROJECT_DIR$/backend/src/main/java/ch/chris/schichtensystem/controller/AuthenticationController.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/src/main/java/ch/chris/schichtensystem/controller/BewerbungController.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/src/main/java/ch/chris/schichtensystem/model/Bewerbung.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/src/main/java/ch/chris/schichtensystem/model/BewerbungRepository.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/src/main/java/ch/chris/schichtensystem/util/AuthenticationManager.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_08_01_24,_08_37_[Changes]/shelved.patch" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_08_01_24__08_37__Changes_.xml" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/backend/pom.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/backend/src/main/java/ch/chris/schichtensystem/controller/ShiftController.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/ch/chris/schichtensystem/controller/ShiftController.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/backend/src/main/java/ch/chris/schichtensystem/controller/UserController.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/ch/chris/schichtensystem/controller/UserController.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/backend/src/main/java/ch/chris/schichtensystem/model/Shift.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/ch/chris/schichtensystem/model/Shift.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/main/java/ch/chris/schichtensystem/model/ShiftRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/ch/chris/schichtensystem/model/ShiftRepository.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/backend/src/main/java/ch/chris/schichtensystem/model/User.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/ch/chris/schichtensystem/model/User.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/main/java/ch/chris/schichtensystem/model/UserRepoitory.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/ch/chris/schichtensystem/model/UserRepository.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/resources/application.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/BewerbungsKalenderPage.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/BewerbungsKalenderPage.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/main/java/ch/chris/schichtensystem/model/UserRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/ch/chris/schichtensystem/model/UserRepository.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/src/CalendarEditPage.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/CalendarEditPage.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/src/CalendarViewPage.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/CalendarViewPage.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/Login.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/Login.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/Register.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/Register.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/Start.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/Start.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/babelrc.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/css/BewerbungsKalenderPage.module.css" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/css/BewerbungsKalenderPage.module.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/css/CalendarEditPage.module.css" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/css/CalendarEditPage.module.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/css/CalendarViewPage.module.css" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/css/CalendarViewPage.module.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/db-test.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/react-app-env.d.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/tests/BewerbungsKalenderPage.test.tsx" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -72,7 +51,7 @@
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
     &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
     &quot;git-widget-placeholder&quot;: &quot;main&quot;,
-    &quot;last_opened_file_path&quot;: &quot;/home/chris/Desktop/schichten.system/frontend&quot;,
+    &quot;last_opened_file_path&quot;: &quot;/home/chris/Desktop/schichten.system&quot;,
     &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
     &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
     &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
@@ -120,6 +99,8 @@
       <workItem from="1706531516624" duration="4000" />
       <workItem from="1709635266228" duration="21000" />
       <workItem from="1709644756335" duration="66000" />
+      <workItem from="1709644851320" duration="37000" />
+      <workItem from="1709813667515" duration="8000" />
     </task>
     <task id="LOCAL-00001" summary="db">
       <option name="closed" value="true" />
@@ -185,7 +166,15 @@
       <option name="project" value="LOCAL" />
       <updated>1704732252441</updated>
     </task>
-    <option name="localTasksCounter" value="9" />
+    <task id="LOCAL-00009" summary="Merge remote-tracking branch 'origin/main'">
+      <option name="closed" value="true" />
+      <created>1709644884225</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1709644884225</updated>
+    </task>
+    <option name="localTasksCounter" value="10" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">

@@ -7,7 +7,7 @@ interface Shift {
     shiftid: string;
     date: string;
     text: string;
-    user_id: string; // Aktualisiert, um der Datenbank zu entsprechen
+    user: any;
 }
 
 interface NewShift {
@@ -33,6 +33,7 @@ const CalendarEditPage: React.FC = () => {
     const [isEditing, setIsEditing] = useState(false);
     const [editingShift, setEditingShift] = useState<Shift | null>(null);
     const apiKey = localStorage.getItem('apikey'); // Anpassung an korrekten Schlüssel
+    const [selectedShift, setSelectedShift] = useState<Shift | null>(null);
 
 
 
@@ -44,13 +45,6 @@ const CalendarEditPage: React.FC = () => {
         },
     });
 
-
-    const handleLogout = () => {
-        localStorage.removeItem('apikey'); // Entfernen des API-Keys beim Logout
-        // Weiterleitung des Benutzers oder Aktualisierung des Zustands
-    };
-
-
     useEffect(() => {
         const fetchData = async () => {
             try {
@@ -58,7 +52,7 @@ const CalendarEditPage: React.FC = () => {
                     api.get<Shift[]>('/shift'),
                     api.get<User[]>('/user/userdetails')
                 ]);
-                const modifiedUsers = [{ id: 'open', firstname: 'Offene', lastname: 'Schichten' }, ...usersResponse.data];
+                const modifiedUsers = [ ...usersResponse.data];
                 setUsers(modifiedUsers);
                 setShifts(shiftsResponse.data);
             } catch (error) {
@@ -104,31 +98,6 @@ const CalendarEditPage: React.FC = () => {
     };
 
 
-    const isShiftOpen = (shift: Shift) => {
-        // Zuerst prüfen, ob userId definiert ist und dann als Zahl vergleichen
-        return shift.user_id !== undefined && parseInt(shift.user_id) === -1;
-    };
-
-
-    const shiftToCreate = {
-        ...newShift,
-        // Verwenden Sie parseInt, um sicherzustellen, dass userId eine Zahl ist
-        userId: newShift.user_id === 'open' ? -1 : parseInt(newShift.user_id)
-    };
-
-
-    const handleInputChange = useCallback((e: { target: { name: any; value: any; }; }) => {
-        setEditingShift(prevShift => {
-            if (!prevShift) return null;
-
-            return {
-                ...prevShift,
-                [e.target.name]: e.target.value || '' // Stellen Sie sicher, dass keine undefined-Werte zugewiesen werden
-            };
-        });
-    }, []);
-
-
     const handleEditShift = (shift: Shift) => {
         setIsEditing(true);
         setEditingShift(shift);
@@ -138,7 +107,7 @@ const CalendarEditPage: React.FC = () => {
         if (editingShift && editingShift.id !== null) {
             const shiftToUpdate = {
                 ...editingShift,
-                userId: editingShift.user_id === 'open' ? '-1' : editingShift.user_id
+                userId: editingShift.user.id === 'open' ? '-1' : editingShift.user.id
             };
             try {
                 const response = await axios.put(`http://localhost:8080/shift/${editingShift.id}`, shiftToUpdate);
@@ -172,26 +141,38 @@ const CalendarEditPage: React.FC = () => {
 // Aktualisierte authenticateUser Funktion
 
 
-
     const addShift = async (event: React.FormEvent) => {
         event.preventDefault();
-        const userIdValue = newShift.user_id === 'open' ? -1 : parseInt(newShift.user_id)
+        let userIdToAdd = newShift.user_id; // Voreinstellung auf die ausgewählte Benutzer-ID
+
+        // Überprüfen, ob die Schicht als "offen" markiert ist
+        if (newShift.user_id === 'open') {
+            // Wenn ja, setzen Sie die Benutzer-ID auf eine spezielle ID für "offene Schichten"
+            userIdToAdd = '0'; // Ersetzen Sie dies durch die tatsächliche ID in Ihrer Datenbank
+        }
 
         const shiftToCreate = {
             shiftid: newShift.shiftid,
             date: newShift.date,
             text: newShift.text,
-            user: newShift.user_id === 'open' ? null : { id: parseInt(newShift.user_id) } // Annahme, das Backend erwartet ein User-Objekt
+            userid: userIdToAdd, // Verwenden Sie die vorberechnete Benutzer-ID
         };
 
+        console.log("Sendende Schichtdaten:", shiftToCreate);
+
         try {
-            const response = await api.post('/shift', shiftToCreate);
+            const response = await api.post('/shift', shiftToCreate); // Stellen Sie sicher, dass Sie shiftToCreate senden
             setShifts([...shifts, response.data]);
-            setNewShift({ shiftid: '', date: '', text: '', user_id: '' });
+            setNewShift({ shiftid: '', date: '', text: '', user_id: '' }); // Zurücksetzen des Formulars
         } catch (error) {
             console.error('Fehler beim Hinzufügen der Schicht:', error);
         }
     };
+
+    const handleApplyClick = (shift: Shift) => {
+        setSelectedShift(shift);
+    };
+
 
 
     if (loading) {
@@ -291,18 +272,15 @@ const CalendarEditPage: React.FC = () => {
                         {daysInWeek.map((day, index) => (
                             <div key={index} className={styles.calendarCell}>
                                 {shifts.filter(shift =>
-                                    (user.id === 'open' ? isShiftOpen(shift) : shift.user_id === user.id) &&
-                                    shift.date === day)
+                                    ((shift.user ? shift.user.id : "welp") === user.id && shift.date === day))
                                     .map((shift, shiftIndex) => (
                                         <div key={shiftIndex} className={styles.shift}>
                                             <div><strong>ID:</strong> {shift.shiftid}</div>
                                             <div><strong>Date:</strong> {shift.date}</div>
                                             <div><strong>Text:</strong> {shift.text}</div>
-                                            <button onClick={() => handleEditShift(shift)}>Bearbeiten</button>
-                                            <button onClick={() => handleDeleteShift(shift.id)}>Löschen</button>
+                                            <button onClick={() => handleApplyClick(shift)}>Bewerben</button>
                                         </div>
-                                    ))
-                                }
+                                    ))}
                             </div>
                         ))}
                     </div>
