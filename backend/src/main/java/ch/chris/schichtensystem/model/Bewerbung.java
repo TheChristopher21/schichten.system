@@ -18,6 +18,15 @@ public class Bewerbung {
     private String datum;
     private String anmerkung;
     private String bewerberName;
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+    
 	public Long getSchichtId() {
 		return schichtId;
 	}

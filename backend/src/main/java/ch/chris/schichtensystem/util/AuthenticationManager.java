@@ -13,14 +13,6 @@ import org.springframework.stereotype.Component;
 import ch.chris.schichtensystem.model.User;
 import ch.chris.schichtensystem.model.UserRepository;
 
-/*
- *  helper class, handling all user authentication
- *  
- *  apiKeys are strored in a hashmap:  (userId:apiKey)
- *  one user can have multiple apiKeys
- *  
- *  apiKeys are random 32 character long strings
- */
 
 @Component
 public class AuthenticationManager {
@@ -67,10 +59,11 @@ public class AuthenticationManager {
 	public record ApiUser(String username, String password) {};
 
 public String getUsernameFromApiKey(String apiKey) {
-    User user = validateApiKey(apiKey);
+    User user = validateApiKey(apiKey);	
     if(user != null) {
         return user.getUsername(); // oder eine andere Methode, um den Benutzernamen zu erhalten
     }
     throw new RuntimeException("User not found for the given API key");
 }
+
 }

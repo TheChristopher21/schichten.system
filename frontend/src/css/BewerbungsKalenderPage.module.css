@@ -1,39 +1,66 @@
-.bewerbungsKalenderPage {
-    /* ... bisherige Stile ... */
+/* SentApplicationsPage.module.css */
+
+.sentApplicationsPage {
+    font-family: Arial, sans-serif;
+    padding: 20px;
 }
 
-.weekNavigation {
-    /* ... bisherige Stile ... */
+.registerNavbar {
+    background-color: #333;
+    color: #fff;
+    padding: 10px;
+    text-align: right;
 }
 
-.calendar {
-    display: grid;
-    grid-template-columns:
-repeat(7, 1fr); /* Erstellt 7 Spalten (für jeden Wochentag eine) /
-gap: 10px; / Abstand zwischen den Spalten */
+.registerNavbar a,
+.registerNavbar button {
+    color: #fff;
+    text-decoration: none;
+    margin-left: 10px;
+    background: none;
+    border: none;
+    cursor: pointer;
 }
 
-.calendarDayContainer {
-    border: 1px solid #ddd; /* Rahmen um jeden Tag /
-padding: 10px; / Innenabstand /
-display: flex;
-flex-direction: column; / Elemente vertikal anordnen */
+.registerNavbar button {
+    background-color: #007bff;
+    padding: 5px 10px;
+    margin-left: 10px;
 }
 
-.calendarDay {
-    font-weight: bold; /* Stil für das Datum /
-margin-bottom: 10px; / Abstand zwischen Datum und Schichten */
+h1 {
+    font-size: 24px;
+    margin-top: 20px;
 }
 
-.offeneSchichten {
-    display: flex;
-    flex-direction: column; /* Schichten vertikal anordnen */
+.applicationList {
+    margin-top: 20px;
 }
 
-.shift {
-    padding: 5px;
-    margin-bottom: 5px; /* Abstand zwischen den Schichten /
-background-color: #f8f8f8; / Hintergrundfarbe für Schichten /
-border-radius: 5px; / Abgerundete Ecken */
+.applicationItem {
+    border: 1px solid #ccc;
+    padding: 10px;
+    margin-bottom: 10px;
 }
 
+.applicationDetail {
+    margin-bottom: 5px;
+}
+
+.applicationDetail strong {
+    font-weight: bold;
+}
+
+.deleteButton {
+    background-color: #ff4d4d;
+    color: #fff;
+    border: none;
+    padding: 5px 10px;
+    cursor: pointer;
+    float: right;
+}
+.applyButtonColumn {
+    /* Beispiel für eine einfache Styling-Option, passen Sie diese nach Bedarf an */
+    text-align: center; /* Zentriert den Button in der Spalte */
+    margin-top: 10px; /* Fügt einen oberen Abstand hinzu */
+}

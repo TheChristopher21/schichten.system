@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import ch.chris.schichtensystem.model.User;
 import ch.chris.schichtensystem.model.UserRepository;
 import ch.chris.schichtensystem.util.AuthenticationManager;
+import ch.chris.schichtensystem.util.AuthenticationManager.ApiUser;
 import de.mkammerer.argon2.Argon2;
 import de.mkammerer.argon2.Argon2Factory;
 import jakarta.validation.Valid;
@@ -81,24 +82,13 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> loginUser(@RequestBody User user) {
-        User existingUser = userRepository.findByUsername(user.getUsername()).orElse(null);
-        
-        if (existingUser != null) {
-            Argon2 argon2 = Argon2Factory.create();
-            if (argon2.verify(existingUser.getPassword(), user.getPassword().toCharArray())) {
-                String apiKey = UUID.randomUUID().toString();
-                existingUser.setApiKey(apiKey);
-                userRepository.save(existingUser);
-                
-                HashMap<String, String> responseBody = new HashMap<>();
-                responseBody.put("token", apiKey);
-                return ResponseEntity.ok(responseBody);
-            }
-        }
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid credentials");
+    public ResponseEntity<String> loginUser(@RequestBody User user) {
+        String apiKey = authenticationManager.authenticate(new ApiUser(user.getUsername(), user.getPassword()));
+        return ResponseEntity.ok(apiKey);
     }
 
+    
+    
     @GetMapping("/getUsername")
     public ResponseEntity<String> getUsername(@RequestHeader("Authorization") String authHeader) {
         try {

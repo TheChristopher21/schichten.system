@@ -98,10 +98,6 @@ const CalendarEditPage: React.FC = () => {
     };
 
 
-    const handleEditShift = (shift: Shift) => {
-        setIsEditing(true);
-        setEditingShift(shift);
-    };
 
     const handleUpdateShift = async () => {
         if (editingShift && editingShift.id !== null) {
@@ -278,7 +274,6 @@ const CalendarEditPage: React.FC = () => {
                                             <div><strong>ID:</strong> {shift.shiftid}</div>
                                             <div><strong>Date:</strong> {shift.date}</div>
                                             <div><strong>Text:</strong> {shift.text}</div>
-                                            <button onClick={() => handleApplyClick(shift)}>Bewerben</button>
                                         </div>
                                     ))}
                             </div>

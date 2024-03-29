@@ -13,13 +13,15 @@ function Login() {
         event.preventDefault();
         try {
             const response = await axios.post("http://localhost:8080/user/login", formData);
-            if (response.data && response.data.token) {
+            if (response.data) {
                 // Vor dem Speichern des neuen API-Schlüssels den vorhandenen entfernen
                 localStorage.removeItem('apikey');
+                localStorage.removeItem('loginTime'); // Remove previous login time
                 // Speichern Sie den neuen API-Schlüssel im Local Storage
-                localStorage.setItem('apikey', response.data.token);
+                localStorage.setItem('apikey', response.data);
+                localStorage.setItem('loginTime', Date.now().toString()); // Store login time
                 // Setzen Sie den API-Schlüssel im State
-                setApiKey(response.data.token);
+                setApiKey(response.data);
                 // Navigieren Sie zur nächsten Seite
                 navigate('/CalendarViewPage');
             } else {
@@ -56,9 +58,9 @@ function Login() {
     return (
         <div className={styles.loginContainer}>
             <div className={styles.loginNavbar}>
-                <a href="/">Home</a> {/* Hier sollte der Pfad angepasst werden */}
-                <a href="/news">Neuigkeiten</a> {/* Angenommen, es gibt eine Route '/news' */}
-                <a href="/login">Login</a> {/* Annahme: Pfadkorrektur */}
+                <a href="/">Home</a>
+                <a href="/news">Neuigkeiten</a>
+                <a href="/login">Login</a>
             </div>
             <div className={styles.loginBody}>
                 <form onSubmit={handleSubmit} className={styles.formLogin}>
