@@ -10,7 +10,6 @@ interface User {
 }
 
 interface Shift {
-    id: number | null;
     shiftid: string;
     date: string;
     text: string;
@@ -38,7 +37,6 @@ const CalendarViewPage: React.FC = () => {
         },
     });
 
-
     api.interceptors.request.use(config => {
         if (apiKey) {
             config.headers.Authorization = `Bearer ${apiKey}`;
@@ -51,10 +49,21 @@ const CalendarViewPage: React.FC = () => {
             try {
                 const apiKeyFromLocalStorage = localStorage.getItem('apikey');
                 if (apiKeyFromLocalStorage) {
-                    setApiKey(apiKeyFromLocalStorage);
-                    setIsLoggedIn(true);
+                    const savedTime = localStorage.getItem('loginTime');
+                    if (savedTime && Date.now() - parseInt(savedTime) < 600000) { // Check if token is still valid (10 minutes)
+                        setApiKey(apiKeyFromLocalStorage);
+                        setIsLoggedIn(true);
+                        console.log("User is logged in");
+                    } else {
+                        localStorage.removeItem('apikey');
+                        localStorage.removeItem('loginTime');
+                        setIsLoggedIn(false);
+                        console.log("User session expired");
+                        navigate('/Login'); // Leite den Benutzer zur Login-Seite weiter
+                    }
                 } else {
                     setIsLoggedIn(false);
+                    navigate('/Login'); // Leite den Benutzer zur Login-Seite weiter
                 }
 
                 const [shiftsResponse, usersResponse] = await Promise.all([
@@ -75,8 +84,8 @@ const CalendarViewPage: React.FC = () => {
         fetchData();
     }, [apiKey]);
 
+    console.log(apiKey)
 
-console.log(apiKey)
     const navigate = useNavigate();
 
     const getDaysInWeek = (date: Date) => {
@@ -84,18 +93,23 @@ console.log(apiKey)
         return new Array(7).fill(null).map((_, index) => new Date(start.getFullYear(), start.getMonth(), start.getDate() + index));
     };
 
-
     const handleApply = async () => {
         if (selectedShift) {
             try {
                 const applicationData = {
-                    shiftId: selectedShift.id,
+                    schichtId: selectedShift.shiftid,
                     datum: selectedShift.date,
                     anmerkung: additionalInfo,
                 };
 
-                // Hier wurde die URL geändert
-                const response = await api.post('/bewerbungen/apply', applicationData);
+                const apiKey = localStorage.getItem('apikey');
+
+                const response = await api.post('/bewerbungen/apply', applicationData, {
+                    headers: {
+                        Authorization: `Bearer ${apiKey}`
+                    }
+                });
+                console.log(applicationData)
                 console.log('Bewerbung erfolgreich gesendet:', response.data);
             } catch (error) {
                 console.error('Fehler beim Senden der Bewerbung:', error);
@@ -124,26 +138,17 @@ console.log(apiKey)
     const daysInWeek = getDaysInWeek(new Date(currentWeek)).map(date => date.toISOString().split('T')[0]);
 
     const handleLogout = () => {
-        localStorage.removeItem('userToken');
+        localStorage.removeItem('apikey');
+        localStorage.removeItem('loginTime'); // Remove login time when logging out
         setIsLoggedIn(false);
         navigate('/');
     };
-
-    if (loading) {
-        return <div>Loading...</div>;
-    }
-
-    if (error) {
-        return <div>Error: {error}</div>;
-    }
-
     return (
         <div className={styles.calendarEditPage}>
             <div className={styles.registerNavbar}>
                 <a href="/">Home</a>
                 {isLoggedIn && <a href="/CalendarEditPage">Kalender Bearbeiten</a>}
-                {/* Die folgende Zeile wurde geändert */}
-                {isLoggedIn  && <a href="/BewerbungsKalenderPage">Ausstehende Bewerbungen</a>}
+                {isLoggedIn && <a href="/BewerbungsKalenderPage">Ausstehende Bewerbungen</a>}
                 {!isLoggedIn && <a href="/Login">Login</a>}
                 {!isLoggedIn && <a href="/Register">Registrieren</a>}
                 {isLoggedIn && <button onClick={handleLogout}>Logout</button>}
@@ -154,12 +159,15 @@ console.log(apiKey)
                 <button onClick={handlePreviousWeek}>Vorherige Woche</button>
                 <button onClick={handleNextWeek}>Nächste Woche</button>
             </div>
-
             <div className={styles.calendar}>
                 <div className={styles.calendarHeader}>
                     <div className={styles.calendarCorner}></div>
                     {daysInWeek.map((day, index) => {
-                        const formattedDay = new Date(day).toLocaleDateString('de-DE', { weekday: 'short', day: 'numeric', month: 'numeric' });
+                        const formattedDay = new Date(day).toLocaleDateString('de-DE', {
+                            weekday: 'short',
+                            day: 'numeric',
+                            month: 'numeric'
+                        });
                         return (
                             <div key={index} className={styles.calendarDay}>
                                 {formattedDay}
@@ -167,28 +175,30 @@ console.log(apiKey)
                         );
                     })}
                 </div>
-
                 {users.map(user => (
                     <div key={user.id} className={styles.calendarRow}>
                         <div className={styles.userName}>{user.firstname} {user.lastname}</div>
                         {daysInWeek.map((day, index) => (
-                            <div key={index} className={styles.calendarCell}>
-                                {shifts.filter(shift =>
-                                    ((shift.user ? shift.user.id : "welp") === user.id && shift.date === day))
-                                    .map((shift, shiftIndex) => (
-                                        <div key={shiftIndex} className={styles.shift}>
+                            <div key={`${user.id}-${index}`} className={styles.calendarCell}>
+                                {shifts.filter(shift => shift.date === day).map((shift, shiftIndex) => {
+                                    // Prüft, ob es sich um eine "offene Schicht" handelt
+                                    const isOffeneSchicht = shift.user && shift.user.id === 1;
+                                    return (
+                                        <div key={shift.shiftid} className={styles.shift}>
                                             <div><strong>ID:</strong> {shift.shiftid}</div>
                                             <div><strong>Date:</strong> {shift.date}</div>
                                             <div><strong>Text:</strong> {shift.text}</div>
-                                            <button onClick={() => handleApplyClick(shift)}>Bewerben</button>
+                                            {isOffeneSchicht && (
+                                                <button onClick={() => handleApplyClick(shift)}>Bewerben</button>
+                                            )}
                                         </div>
-                                    ))}
+                                    );
+                                })}
                             </div>
                         ))}
                     </div>
                 ))}
             </div>
-
             {selectedShift && (
                 <div className={styles.applyPopup}>
                     <h2>Bewerbung für Schicht:</h2>
@@ -201,12 +211,11 @@ console.log(apiKey)
                         onChange={(e) => setAdditionalInfo(e.target.value)}
                     />
                     <button onClick={handleApply}>Jetzt bewerben</button>
-                    <button onClick={handleClosePopup}>Abbrechen</button> {/* Abbrechen-Button */}
+                    <button onClick={handleClosePopup}>Abbrechen</button>
                 </div>
             )}
         </div>
     );
-
 };
 
-export default CalendarViewPage;
+    export default CalendarViewPage;
