@@ -1,8 +1,7 @@
-/* SentApplicationsPage.module.css */
-
-.sentApplicationsPage {
+.calendarEditPage {
     font-family: Arial, sans-serif;
     padding: 20px;
+    background-color: #f4f4f4; /* Hintergrund für die gesamte Seite */
 }
 
 .registerNavbar {
@@ -12,55 +11,143 @@
     text-align: right;
 }
 
-.registerNavbar a,
-.registerNavbar button {
+.registerNavbar a, .registerNavbar button {
     color: #fff;
     text-decoration: none;
     margin-left: 10px;
-    background: none;
+    background-color: transparent;
     border: none;
+    padding: 5px 10px;
     cursor: pointer;
+    transition: background-color 0.3s ease; /* Weicher Übergang für Hover-Effekte */
+}
+
+.registerNavbar a:hover, .registerNavbar button:hover {
+    background-color: #555; /* Farbänderung beim Hover */
 }
 
 .registerNavbar button {
-    background-color: #007bff;
-    padding: 5px 10px;
-    margin-left: 10px;
+    background-color: #dc3545;
+    transition: opacity 0.3s ease; /* Weicher Übergang für Hover-Effekte */
+}
+
+.registerNavbar button:hover {
+    opacity: 0.8; /* Transparenzänderung beim Hover */
 }
 
 h1 {
     font-size: 24px;
     margin-top: 20px;
+    color: #333;
 }
 
-.applicationList {
-    margin-top: 20px;
+.weekNavigation {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 10px;
 }
 
-.applicationItem {
-    border: 1px solid #ccc;
-    padding: 10px;
-    margin-bottom: 10px;
-}
-
-.applicationDetail {
-    margin-bottom: 5px;
-}
-
-.applicationDetail strong {
-    font-weight: bold;
-}
-
-.deleteButton {
-    background-color: #ff4d4d;
+.weekNavigation button {
+    background-color: #007bff;
     color: #fff;
     border: none;
     padding: 5px 10px;
     cursor: pointer;
-    float: right;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Schatten für die Buttons */
 }
-.applyButtonColumn {
-    /* Beispiel für eine einfache Styling-Option, passen Sie diese nach Bedarf an */
-    text-align: center; /* Zentriert den Button in der Spalte */
-    margin-top: 10px; /* Fügt einen oberen Abstand hinzu */
+
+.calendarHeader {
+    display: flex;
+    background-color: #007bff;
+    color: #fff;
+    font-weight: bold;
+    padding: 5px;
+}
+
+.calendarCorner {
+    flex: 1;
+}
+
+.calendarDay {
+    flex: 1;
+    text-align: center;
+    padding: 10px 0; /* Platz oben und unten für den Kalenderkopf */
+}
+
+.calendarRow {
+    display: flex;
+    align-items: flex-start; /* Positioniere Elemente am Anfang der Flexbox */
+    margin-top: 10px;
+}
+
+.userName {
+    font-weight: bold;
+    flex: 1;
+    padding: 5px;
+    background-color: #f0f0f0;
+}
+
+.calendarCell {
+    flex: 1;
+    border: 1px solid #ccc;
+    padding: 10px;
+    margin-right: 10px;
+    background-color: #f9f9f9;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start; /* Inhalte linksbündig ausrichten */
+}
+
+.shift {
+    border: 1px solid #ddd;
+    padding: 10px;
+    margin-bottom: 10px; /* Abstand zwischen den Schichten */
+    background-color: #fff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Leichter Schatten für Tiefe */
+    transition: box-shadow 0.3s ease; /* Weicher Übergang für den Hover-Effekt */
+}
+
+.shift:hover {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Stärkerer Schatten beim Hover */
+}
+
+.shift div {
+    margin-bottom: 5px;
+}
+
+.shift strong {
+    font-weight: bold;
+}
+
+.confirmationOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.confirmationPopup {
+    background-color: white;
+    padding: 20px;
+    border-radius: 5px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+.confirmationPopup p {
+    margin: 0 0 10px 0;
+}
+
+.confirmationPopup button {
+    background-color: #28a745;
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    cursor: pointer;
 }

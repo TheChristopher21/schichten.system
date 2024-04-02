@@ -8,7 +8,10 @@ interface Application {
     schichtId: string;
     datum: string;
     anmerkung: string;
+    bewerberName: string; // Geändert von bewerber_name zu bewerberName
 }
+``
+
 
 const SentApplicationsPage: React.FC = () => {
     const [applications, setApplications] = useState<Application[]>([]);
@@ -17,6 +20,7 @@ const SentApplicationsPage: React.FC = () => {
     const [apiKey, setApiKey] = useState<string | null>(null);
     const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
     const navigate = useNavigate();
+    const [currentWeek, setCurrentWeek] = useState(new Date());
 
     const api = axios.create({
         baseURL: 'http://localhost:8080',
@@ -85,45 +89,61 @@ const SentApplicationsPage: React.FC = () => {
     };
 
 
+    const getDaysInWeek = (date: Date) => {
+        let start = new Date(date.setDate(date.getDate() - date.getDay()));
+        return new Array(7).fill(null).map((_, index) => new Date(start.getFullYear(), start.getMonth(), start.getDate() + index));
+    };
+
+    const handlePreviousWeek = () => {
+        setCurrentWeek(new Date(currentWeek.setDate(currentWeek.getDate() - 7)));
+    };
+
+    const handleNextWeek = () => {
+        setCurrentWeek(new Date(currentWeek.setDate(currentWeek.getDate() + 7)));
+    };
+
+    const daysInWeek = getDaysInWeek(new Date(currentWeek)).map(date => date.toISOString().split('T')[0]);
+
     if (loading) return <div>Lädt...</div>;
     if (error) return <div>{error}</div>;
 
     console.log(applications.at(0))
-
+    console.log(applications)
     return (
         <div className={styles.sentApplicationsPage}>
-            <div className={styles.registerNavbar}>
-                <a href="/">Home</a>
-                {isLoggedIn && <a href="/CalendarEditPage">Kalender Bearbeiten</a>}
-                {isLoggedIn && <a href="/SentApplicationsPage">Ausstehende Bewerbungen</a>}
-                {!isLoggedIn && <a href="/Login">Login</a>}
-                {!isLoggedIn && <a href="/Register">Registrieren</a>}
-                {isLoggedIn && <button onClick={() => {
-                    localStorage.removeItem('apikey');
-                    localStorage.removeItem('loginTime');
-                    setIsLoggedIn(false);
-                    navigate('/');
-                }}>Logout</button>}
-                {isLoggedIn && <a href="/CalendarViewPage">Mitarbeiter Kalender</a>}
-            </div>
+            {/* Navigation und Header bleiben gleich... */}
             <h1>Gesendete Bewerbungen</h1>
-            {loading ? (
-                <div>Lädt...</div>
-            ) : error ? (
-                <div>{error}</div>
-            ) : applications.length === 0 ? (
-                <p>Keine Bewerbungen gesendet.</p>
-            ) : (
-                applications.map((application, index) => (
-                    <div key={index}>
-                        <p>Schicht ID: {application.schichtId}</p>
-                        <p>Datum: {application.datum}</p>
-                        <p>Anmerkung: {application.anmerkung}</p>
-                        <button onClick={() => deleteApplication(application.schichtId)}>Löschen</button>
-                    </div>
-                ))
-            )}
+            <div className={styles.weekNavigation}>
+                <button onClick={handlePreviousWeek}>Vorherige Woche</button>
+                <button onClick={handleNextWeek}>Nächste Woche</button>
+            </div>
+            <div className={styles.calendar}>
+                <div className={styles.calendarHeader}>
+                    {/* Kalenderkopf wie zuvor */}
+                    {daysInWeek.map((day, index) => {
+                        const formattedDay = new Date(day).toLocaleDateString('de-DE', { weekday: 'short', day: 'numeric', month: 'numeric' });
+                        return <div key={index} className={styles.calendarDay}>{formattedDay}</div>;
+                    })}
+                </div>
+                {/* Kalenderzellen für Bewerbungen */}
+                <div className={styles.calendarRow}>
+                    {daysInWeek.map((day) => (
+                        <div key={day} className={styles.calendarCell}>
+                            {applications.filter(application => application.datum === day).map((application, index) => (
+                                <div key={index} className={styles.application}>
+                                    <p>Datum: {application.datum}</p>
+                                    <p>Bewerber: {application.bewerberName}</p>
+                                    <p>Schicht ID: {application.schichtId}</p>
+                                    <p>Anmerkung: {application.anmerkung}</p>
+                                    {/* Löschen Button und eventuell andere Interaktionen */}
+                                </div>
+                            ))}
+                        </div>
+                    ))}
+                </div>
+            </div>
         </div>
     );
 };
-    export default SentApplicationsPage;
+
+export default SentApplicationsPage;

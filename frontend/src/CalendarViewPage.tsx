@@ -93,6 +93,8 @@ const CalendarViewPage: React.FC = () => {
         return new Array(7).fill(null).map((_, index) => new Date(start.getFullYear(), start.getMonth(), start.getDate() + index));
     };
 
+
+
     const handleApply = async () => {
         if (selectedShift) {
             try {
@@ -109,8 +111,17 @@ const CalendarViewPage: React.FC = () => {
                         Authorization: `Bearer ${apiKey}`
                     }
                 });
-                console.log(applicationData)
                 console.log('Bewerbung erfolgreich gesendet:', response.data);
+
+                // Bewerbung erfolgreich, zeige Bestätigungspopup
+                setShowConfirmation(true);
+                setTimeout(() => {
+                    setShowConfirmation(false); // Verberge das Bestätigungspopup nach 3 Sekunden
+                }, 3000);
+
+                // Hier schließt du das Bewerbungsformular-Popup
+                handleClosePopup();
+
             } catch (error) {
                 console.error('Fehler beim Senden der Bewerbung:', error);
             }
@@ -124,7 +135,12 @@ const CalendarViewPage: React.FC = () => {
     };
 
     const handleApplyClick = (shift: Shift) => {
-        setSelectedShift(shift);
+        if (shift.user && parseInt(shift.user.id) === 1) { // Überprüfe, ob die Schicht der Benutzer-ID 1 zugeordnet ist
+            setSelectedShift(shift);
+        } else {
+            // Eventuell eine Benachrichtigung anzeigen, dass diese Schicht nicht beworben werden kann
+            console.log("Diese Schicht ist nicht für Bewerbungen offen.");
+        }
     };
 
     const handlePreviousWeek = () => {
@@ -136,6 +152,9 @@ const CalendarViewPage: React.FC = () => {
     };
 
     const daysInWeek = getDaysInWeek(new Date(currentWeek)).map(date => date.toISOString().split('T')[0]);
+
+    const [showConfirmation, setShowConfirmation] = useState(false);
+
 
     const handleLogout = () => {
         localStorage.removeItem('apikey');
@@ -179,21 +198,20 @@ const CalendarViewPage: React.FC = () => {
                     <div key={user.id} className={styles.calendarRow}>
                         <div className={styles.userName}>{user.firstname} {user.lastname}</div>
                         {daysInWeek.map((day, index) => (
-                            <div key={`${user.id}-${index}`} className={styles.calendarCell}>
-                                {shifts.filter(shift => shift.date === day).map((shift, shiftIndex) => {
-                                    // Prüft, ob es sich um eine "offene Schicht" handelt
-                                    const isOffeneSchicht = shift.user && shift.user.id === 1;
-                                    return (
-                                        <div key={shift.shiftid} className={styles.shift}>
-                                            <div><strong>ID:</strong> {shift.shiftid}</div>
-                                            <div><strong>Date:</strong> {shift.date}</div>
-                                            <div><strong>Text:</strong> {shift.text}</div>
-                                            {isOffeneSchicht && (
-                                                <button onClick={() => handleApplyClick(shift)}>Bewerben</button>
-                                            )}
-                                        </div>
-                                    );
-                                })}
+                            <div key={`${user.id}-${day}`} className={styles.calendarCell}>
+                                {shifts.filter(shift => shift.date === day && shift.user?.id === user.id).map(shift => (
+                                    <div key={shift.shiftid} className={styles.shift}>
+                                        <div><strong>ID:</strong> {shift.shiftid}</div>
+                                        <div><strong>Date:</strong> {shift.date}</div>
+                                        <div><strong>Text:</strong> {shift.text}</div>
+                                        {shift.user && parseInt(shift.user.id) === 1 && (
+                                            <button onClick={() => handleApplyClick(shift)}>Bewerben</button>
+                                        )}
+                                    </div>
+                                ))}
+                                {shifts.filter(shift => shift.date === day && shift.user?.id === user.id).length === 0 && user.id === '1' && (
+                                    <div className={styles.shift}>Keine Schichten</div>
+                                )}
                             </div>
                         ))}
                     </div>
@@ -214,8 +232,18 @@ const CalendarViewPage: React.FC = () => {
                     <button onClick={handleClosePopup}>Abbrechen</button>
                 </div>
             )}
+
+            {showConfirmation && (
+                <div className={styles.confirmationOverlay}>
+                    <div className={styles.confirmationPopup}>
+                        <p>Erfolgreich gesendet</p>
+                        <button onClick={() => setShowConfirmation(false)}>OK</button>
+                    </div>
+                </div>
+            )}
         </div>
     );
+
 };
 
     export default CalendarViewPage;
