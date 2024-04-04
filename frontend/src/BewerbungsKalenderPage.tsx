@@ -4,7 +4,6 @@ import styles from './css/BewerbungsKalenderPage.module.css';
 import { useNavigate } from "react-router-dom";
 
 interface Application {
-    id: string;
     schichtId: string;
     datum: string;
     anmerkung: string;
@@ -34,7 +33,7 @@ const SentApplicationsPage: React.FC = () => {
             const apiKeyFromLocalStorage = localStorage.getItem('apikey');
             if (apiKeyFromLocalStorage) {
                 const savedTime = localStorage.getItem('loginTime');
-                if (savedTime && Date.now() - parseInt(savedTime) < 6000000000000000000) { // Check if token is still valid (10 minutes)
+                if (savedTime && Date.now() - parseInt(savedTime) < 6000000) { // Check if token is still valid (10 minutes)
                     setApiKey(apiKeyFromLocalStorage);
                     setIsLoggedIn(true);
                 } else {
@@ -111,7 +110,6 @@ const SentApplicationsPage: React.FC = () => {
     console.log(applications)
     return (
         <div className={styles.sentApplicationsPage}>
-            {/* Navigation und Header bleiben gleich... */}
             <h1>Gesendete Bewerbungen</h1>
             <div className={styles.weekNavigation}>
                 <button onClick={handlePreviousWeek}>Vorherige Woche</button>
@@ -135,7 +133,6 @@ const SentApplicationsPage: React.FC = () => {
                                     <p>Bewerber: {application.bewerberName}</p>
                                     <p>Schicht ID: {application.schichtId}</p>
                                     <p>Anmerkung: {application.anmerkung}</p>
-                                    {/* Löschen Button und eventuell andere Interaktionen */}
                                 </div>
                             ))}
                         </div>
